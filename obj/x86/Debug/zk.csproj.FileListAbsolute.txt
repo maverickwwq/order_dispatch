@@ -1,0 +1,10 @@
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\bin\Debug\zk.exe
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\bin\Debug\zk.pdb
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.Properties.Resources.resources
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.csproj.GenerateResource.Cache
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.exe
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.pdb
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.Form1.resources
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.csprojResolveAssemblyReference.cache
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\bin\Debug\Newtonsoft.Json.dll
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\bin\Debug\zk.exe.config
