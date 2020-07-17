@@ -7,6 +7,8 @@ using System.Threading;
 using System.Configuration;
 using DispatchServer.BaseClass;
 
+//这个项目是中控机房的客户端
+
 namespace zk
 {
 
@@ -31,19 +33,19 @@ namespace zk
                 return;
             }
 
-
             Application.Run(f);
             //用户登录
 
             //请求获取未处理订单
-            //机房端未接收的，下发机房失败的，机房未反馈的三种状态
+            //机房端未接收的，下发机房失败或者尚未下发，机房未反馈的三种状态
             netandorder.askForAllUnfinishedOrder_send();// waiting for server ,receive the "QUERY_ORDERS_REPLY"
 
+            //  ---------------------------丢弃QUERY_ORDERS_REPLY之前的所有数据包------------------------
             RSData rsd_tmp = new RSData();//get one QUERY_ORDERS_REPLY
-            while(true){
+            while(true){                                        
                 if(GlobalVarForApp.receiveMessageQueue.Count()>0){
                     rsd_tmp=GlobalVarForApp.receiveMessageQueue.Dequeue();
-                    if(rsd_tmp.CommType=="QUERY_ORDERS_REPLY")
+                    if (rsd_tmp.CommType == "QUERY_ORDERS_REPLY")      //丢弃所有包，直到QUERY_ORDERS_REPLY
                         break;
                 }
                 Thread.Sleep(1000);//wait for the data to be sent and receive
@@ -51,18 +53,20 @@ namespace zk
             if (rsd_tmp.query.totalRecords != 0)    //存在未完成状态的调度令       数据存在GLOBALVARFORAPP.tbh_orsersInfoList
             {
                 int i = 0;
-                foreach(OrderAndOp tmpOao in rsd_tmp.orderAndOpList){
-                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);
-                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);
-                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;
+                foreach(OrderAndOp tmpOao in rsd_tmp.orderAndOpList)
+                {
+                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);     //获取未完成调度令的 od id
+                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);//获取文号
+                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;              //获取文号
                     i++;
                 }
-                for (i = 0; i < GlobalVarForApp.tbh_ordersInfoList.Count(); i++)        //发送query_order_request
-                {
+                for (i = 0; i < GlobalVarForApp.tbh_ordersInfoList.Count(); i++)        //发送query_order_request，
+                {                                                                                                          //请求获取所有未完成调度令的详细信息
                     Query query=new Query();
                     query.queryOrderODID=GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID.ToString();
                     netandorder.query_order_request_send(query);
                 }
+                // i代表未完成调度令的数量
                 while (i == 0)
                 {
                     if (GlobalVarForApp.receiveMessageQueue.Count() > 0)
@@ -106,11 +110,12 @@ namespace zk
                 return false;
             }
             //初始化全局变量
-            GlobalVarForApp.receiveMessageQueue.Clear(); //消息接收队列
-            GlobalVarForApp.sendMessageQueue.Clear();//消息发送队列
-            GlobalVarForApp.tbh_ordersInfoList.Clear();//存放未处理完成的所有调度令的信息                 
+            GlobalVarForApp.receiveMessageQueue.Clear();    //消息接收队列
+            GlobalVarForApp.sendMessageQueue.Clear();        //消息发送队列
+            GlobalVarForApp.tbh_ordersInfoList.Clear();             //存放未处理完成的所有调度令的信息                 
+            
             //网络连接正常？
-            if (network.networkInitialize(f) == true)   //network normal
+            if (network.networkInitialize(f) == true)                       //网络正常，正常则启动发送、接收线程
             {
                 //do something
                 GlobalVarForApp.networkStatusBool = true;
@@ -122,6 +127,7 @@ namespace zk
                 appLog.exceptionRecord("配置文件读取失败,程序无法启动");
                 return false;
             }
+            
             //初始化声音提示模块
             voiceReminder.speakerIni();
         return true;

@@ -21,6 +21,9 @@ namespace zk
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //界面标题数组 标题宽度
+            String[] title_UI = {"序号","单号","日常","机房","状态","时间"};
+            int[] title_UI_width = {30,100,30,30,100,100 };
             this.FormClosing += new FormClosingEventHandler(programExit);
             tbd_OrderInfo_dgv.RowHeadersVisible = false;//不要每行的第一个序号单元       
             tbd_OrderInfo_dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect ;//全行选择
@@ -40,11 +43,22 @@ namespace zk
             tbd_OrderInfo_dgv.DefaultCellStyle.BackColor = Color.LightYellow;                             //单元格默认背景色
             tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;   //水平分割线
             tbd_OrderInfo_dgv.BackgroundColor = Color.White;                //datagridview背景色
-            tbd_OrderInfo_dgv.ColumnCount = 5;    //共6列
+            tbd_OrderInfo_dgv.ColumnCount = title_UI.Length;    //共6列
 
-            tbd_OrderInfo_dgv.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            tbd_OrderInfo_dgv.Columns[0].Resizable = DataGridViewTriState.False;
-            tbd_OrderInfo_dgv.Columns[0].Width = 40;
+            //tbd_OrderInfo_dgv.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            //tbd_OrderInfo_dgv.Columns[0].Resizable = DataGridViewTriState.False;
+            //tbd_OrderInfo_dgv.Columns[0].Width = 40;
+
+            for (int i = 0; i < title_UI.Length ; i++ )
+            {
+                //tbd_OrderInfo_dgv.Columns[i].MinimumWidth = 40;
+                tbd_OrderInfo_dgv.Columns[i].FillWeight = title_UI_width[i];
+                tbd_OrderInfo_dgv.Columns[i].Name = title_UI[i];
+                tbd_OrderInfo_dgv.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+            /*
+            tbd_OrderInfo_dgv.Columns[0].MinimumWidth = 40;
+            tbd_OrderInfo_dgv.Columns[0].FillWeight = 30;
             tbd_OrderInfo_dgv.Columns[0].Name = "序号";
 
             tbd_OrderInfo_dgv.Columns[1].MinimumWidth = 50;
@@ -65,7 +79,7 @@ namespace zk
             tbd_OrderInfo_dgv.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
             tbd_OrderInfo_dgv.Columns[2].SortMode = DataGridViewColumnSortMode.NotSortable;
             tbd_OrderInfo_dgv.Columns[3].SortMode = DataGridViewColumnSortMode.NotSortable;
-            tbd_OrderInfo_dgv.Columns[4].SortMode = DataGridViewColumnSortMode.NotSortable;
+            tbd_OrderInfo_dgv.Columns[4].SortMode = DataGridViewColumnSortMode.NotSortable;*/
 
             tbd_OrderInfo_dgv.ColumnHeadersHeight = 30;//
 
