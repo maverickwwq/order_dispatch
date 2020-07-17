@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using DispatchServer;
+using System.Timers;
+using System.Threading;
 
 namespace zk
 {
@@ -51,7 +53,6 @@ namespace zk
 
             for (int i = 0; i < title_UI.Length ; i++ )
             {
-                //tbd_OrderInfo_dgv.Columns[i].MinimumWidth = 40;
                 tbd_OrderInfo_dgv.Columns[i].FillWeight = title_UI_width[i];
                 tbd_OrderInfo_dgv.Columns[i].Name = title_UI[i];
                 tbd_OrderInfo_dgv.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -81,28 +82,32 @@ namespace zk
             tbd_OrderInfo_dgv.Columns[3].SortMode = DataGridViewColumnSortMode.NotSortable;
             tbd_OrderInfo_dgv.Columns[4].SortMode = DataGridViewColumnSortMode.NotSortable;*/
 
-            tbd_OrderInfo_dgv.ColumnHeadersHeight = 30;//
-
+            tbd_OrderInfo_dgv.ColumnHeadersHeight = 30;//设定标题行行高
             tbd_OrderInfo_dgv.ClearSelection();             //初始无选择行
 
             tbd_OrderInfo_dgv.Show();
-            tbd_OrderInfo_display();
+            //tbd_OrderInfo_display();
         }
 
-        public delegate void tbd_orderInfo_dgv_delegate();
-        public void UIrefresh()
-        {
-            tbd_OrderInfo_dgv.BeginInvoke(new tbd_orderInfo_dgv_delegate(tbd_OrderInfo_display));
+
+        public delegate void UI_refresh_delegate();
+        public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
+        {                                                                                                         //同时不会产生错误
+          tbd_OrderInfo_dgv.BeginInvoke(new UI_refresh_delegate(tbd_OrderInfo_display)); 
+          Thread.Sleep(1000);
         }
 
-        private void tbd_OrderInfo_display()
+        //------------------------------------------------------------------------------------------------
+        //----------------------界面数值更新函数，其他线程不能直接调用----------------
+        //------------------------------------------------------------------------------------------------
+        public void tbd_OrderInfo_display()
         {
             if (GlobalVarForApp.tbh_ordersInfoList.Count == 0)         //无待处理调度令返回
                 return;
             else   //有待处理调度令
             {            
                 tbd_OrderInfo_dgv.Rows.Clear();     //先清空
-                int ordersCount = 0;                        //
+                int ordersCount = 0;                          //
                 foreach (OrderInfo tmpOrInfo in GlobalVarForApp.tbh_ordersInfoList)
                 {
                     tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
@@ -263,7 +268,6 @@ namespace zk
                         tmpOI.commTime=tmp.CommTime;
                         tmpOI.orderInfo = tmp.order;
                         tmpOI.infoReturn = tmp.infoReturn;
-
                         
                         tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
                         GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
@@ -273,7 +277,7 @@ namespace zk
                             GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
                         }
                         //od_dis.od_dis_show();            //新调度令显示                           
-                        tbd_OrderInfo_display();
+                        //tbd_OrderInfo_display();
 
                         //
                         //接收到新调度语音提示
@@ -302,7 +306,7 @@ namespace zk
                         tmpOI.infoReturn = tmp.infoReturn;
                         tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
                         GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                        tbd_OrderInfo_display();
+                        //tbd_OrderInfo_display();
                         break;
 
                     default: /* 可选的 */

@@ -19,6 +19,7 @@ namespace zk
         /// </summary>
         /// 
         //
+
         [STAThread]
         static void Main()
         {
@@ -26,7 +27,11 @@ namespace zk
             Application.SetCompatibleTextRenderingDefault(false);
            
             Form1 f=new Form1();
-
+            System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(2000);
+            // Hook up the Elapsed event for the timer. 
+            UI_refresh_timer.Elapsed += f.UIrefresh;
+            UI_refresh_timer.AutoReset = true;
+            UI_refresh_timer.Enabled = true;
             if (program_initial(f) == false)
             {
                 MessageBox.Show("系统初始化失败，无法启动");
