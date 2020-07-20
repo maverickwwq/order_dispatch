@@ -57,33 +57,9 @@ namespace zk
                 tbd_OrderInfo_dgv.Columns[i].Name = title_UI[i];
                 tbd_OrderInfo_dgv.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
             }
-            /*
-            tbd_OrderInfo_dgv.Columns[0].MinimumWidth = 40;
-            tbd_OrderInfo_dgv.Columns[0].FillWeight = 30;
-            tbd_OrderInfo_dgv.Columns[0].Name = "序号";
 
-            tbd_OrderInfo_dgv.Columns[1].MinimumWidth = 50;
-            tbd_OrderInfo_dgv.Columns[1].FillWeight = 100;
-            tbd_OrderInfo_dgv.Columns[1].Name = "单号";
-
-            tbd_OrderInfo_dgv.Columns[2].MinimumWidth = 50;
-            tbd_OrderInfo_dgv.Columns[2].FillWeight = 30;
-            tbd_OrderInfo_dgv.Columns[2].Name = "机房";
-
-            tbd_OrderInfo_dgv.Columns[3].FillWeight = 100;
-            tbd_OrderInfo_dgv.Columns[3].Name = "状态";
-
-            tbd_OrderInfo_dgv.Columns[4].FillWeight = 100;
-            tbd_OrderInfo_dgv.Columns[4].Name = "时间";
-
-            tbd_OrderInfo_dgv.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
-            tbd_OrderInfo_dgv.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
-            tbd_OrderInfo_dgv.Columns[2].SortMode = DataGridViewColumnSortMode.NotSortable;
-            tbd_OrderInfo_dgv.Columns[3].SortMode = DataGridViewColumnSortMode.NotSortable;
-            tbd_OrderInfo_dgv.Columns[4].SortMode = DataGridViewColumnSortMode.NotSortable;*/
-
-            tbd_OrderInfo_dgv.ColumnHeadersHeight = 30;//设定标题行行高
-            tbd_OrderInfo_dgv.ClearSelection();             //初始无选择行
+            tbd_OrderInfo_dgv.ColumnHeadersHeight = 30;  //设定标题行行高
+            tbd_OrderInfo_dgv.ClearSelection();                     //初始无选择行
 
             tbd_OrderInfo_dgv.Show();
             //tbd_OrderInfo_display();
@@ -94,7 +70,7 @@ namespace zk
         public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
         {                                                                                                         //同时不会产生错误
           tbd_OrderInfo_dgv.BeginInvoke(new UI_refresh_delegate(tbd_OrderInfo_display)); 
-          Thread.Sleep(1000);
+          
         }
 
         //------------------------------------------------------------------------------------------------
@@ -178,9 +154,9 @@ namespace zk
                     }*/
 
                     //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[5].Value = tmpOrInfo.orderInstruction.AN_ID;                       //天线
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = "待完成";
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = tmpOrInfo.infoReturn;
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = tmpOrInfo.commTime;
+                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = "待完成";
+                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = tmpOrInfo.infoReturn;
+                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = tmpOrInfo.commTime;
                     ordersCount++;
                 }
             }

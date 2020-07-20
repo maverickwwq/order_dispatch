@@ -135,6 +135,10 @@ namespace zk
             
             //初始化声音提示模块
             voiceReminder.speakerIni();
+
+            //开启数据处理线程，处理网络接收的数据包
+            messageHandle_thread = new Thread(netandorder.HandleTheMessageReceive);
+            messageHandle_thread.Start();
         return true;
         }
 

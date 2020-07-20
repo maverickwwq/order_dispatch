@@ -5,6 +5,7 @@ using System.Text;
 using DispatchServer;
 using DispatchServer.BaseClass;
 using System.Windows.Forms;
+using System.Threading;
 namespace zk
 {
     public class netandorder
@@ -88,7 +89,7 @@ namespace zk
         public static OrderInfo down_order_reply_receive(RSData tmp,OrderInfo oitmp)    //客户端接收通知
         {
             oitmp.orderInfo = tmp.order;
-            oitmp.orderStatus =OrderStatus.unconfirmed;
+            oitmp.orderStatus =OrderStatus.unconfirmed;     //
             return oitmp;
         }
 
@@ -127,96 +128,99 @@ namespace zk
         {
             RSData rcv_rsd = new RSData();
             OrderInfo tmpOI = new OrderInfo();      //调度令信息
-            while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
-            {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
-                            //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
-                rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
+            while (true)
+            {
+                while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
+                {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
+                    //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
+                    rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
 
-                switch (rcv_rsd.CommType.Trim())
-                {
-                    case "LOGIN_REPLY":
-                        break;
+                    switch (rcv_rsd.CommType.Trim())
+                    {
+                        case "LOGIN_REPLY":
+                            break;
 
-                    case "ADD_USER_REPLY":
-                        break;
+                        case "ADD_USER_REPLY":
+                            break;
 
-                    case "DELETE_USER_REPLY":
-                        break;
+                        case "DELETE_USER_REPLY":
+                            break;
 
-                    case "DOWN_ORDER_REPLY":
-                        MessageBox.Show("Down order reply");
-                        tmpOI.commTime = rcv_rsd.CommTime;
-                        tmpOI.orderInfo = rcv_rsd.order;
-                        tmpOI.infoReturn = rcv_rsd.infoReturn;
-
-
-                        tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
-                        GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                        //对orInfo全局变量按调度令号进行排序
-                        if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)
-                        {
-                            //GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
-                        }
-                        //od_dis.od_dis_show();            //新调度令显示                           
-                       // Form1.tbd_OrderInfo_display();
-
-                        //
-                        //接收到新调度语音提示
-                        //
-
-                        break;
+                        case "DOWN_ORDER_REPLY":
+                            MessageBox.Show("Down order reply");
+                            tmpOI.commTime = rcv_rsd.CommTime;
+                            tmpOI.orderInfo = rcv_rsd.order;
+                            tmpOI.infoReturn = rcv_rsd.infoReturn;
 
 
-                    case "QUERY_ORDERS_REPLY":      //批量查询
-                        //调度令信息
-                        List<OrderAndOp> tmpOaoList = new List<OrderAndOp>();
-                        tmpOaoList=query_orders_reply_receive(rcv_rsd);
-                        if (rcv_rsd.query.pageSize == 100)      //系统初始化时查询所有未完成调度令
-                        {
-                            //清空全局变量     tbh_orderInfo
-                            if (tmpOaoList.Count() != 0)       //非空链条
+                            tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
+                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
+                            //对orInfo全局变量按调度令号进行排序
+                            if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)
                             {
-                                int i=0;
-                                foreach (OrderAndOp tmpOao in tmpOaoList)//获取所有未完成调度令的od_id  od_year od_code
+                                //GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
+                            }
+                            //od_dis.od_dis_show();            //新调度令显示                           
+                            // Form1.tbd_OrderInfo_display();
+
+                            //
+                            //接收到新调度语音提示
+                            //
+
+                            break;
+
+
+                        case "QUERY_ORDERS_REPLY":      //批量查询
+                            //调度令信息
+                            List<OrderAndOp> tmpOaoList = new List<OrderAndOp>();
+                            tmpOaoList = query_orders_reply_receive(rcv_rsd);
+                            if (rcv_rsd.query.pageSize == 100)      //系统初始化时查询所有未完成调度令
+                            {
+                                //清空全局变量     tbh_orderInfo
+                                if (tmpOaoList.Count() != 0)       //非空链条
                                 {
-                                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);
-                                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);
-                                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;
-                                    i++;
+                                    int i = 0;
+                                    foreach (OrderAndOp tmpOao in tmpOaoList)//获取所有未完成调度令的od_id  od_year od_code
+                                    {
+                                        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);
+                                        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);
+                                        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;
+                                        i++;
+                                    }
                                 }
                             }
-                        }
-                        else                              //调度令查询功能
-                        {
+                            else                              //调度令查询功能
+                            {
 
-                        }
-                        break;
+                            }
+                            break;
 
-                    case "QUERY_ORDER_REPLY":         //单个查询
-                        //调度令信息
+                        case "QUERY_ORDER_REPLY":         //单个查询
+                            //调度令信息
 
-                        break;
+                            break;
 
-                    case "NEW_MESSAGE":
-                        break;
+                        case "NEW_MESSAGE":
+                            break;
 
-                    case "RECEIVE_ORDER_REPLY":
-                        //提取调度令信息
-                        tmpOI.commTime = rcv_rsd.CommTime;
-                        tmpOI.orderInfo = rcv_rsd.order;
-                        tmpOI.infoReturn = rcv_rsd.infoReturn;
-                        tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
-                        GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                        //tbd_OrderInfo_display();
-                        break;
+                        case "RECEIVE_ORDER_REPLY":
+                            //提取调度令信息
+                            tmpOI.commTime = rcv_rsd.CommTime;
+                            tmpOI.orderInfo = rcv_rsd.order;
+                            tmpOI.infoReturn = rcv_rsd.infoReturn;
+                            tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
+                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
+                            //tbd_OrderInfo_display();
+                            break;
 
-                    default: /* 可选的 */
-                        break;
+                        default: /* 可选的 */
+                            break;
 
+                    }
+                    // }
                 }
-                // }
+                Thread.Sleep(Timeout.Infinite);
             }
-            return;
         }
 
 

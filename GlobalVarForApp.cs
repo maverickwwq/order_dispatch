@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DispatchServer;
 using DispatchServer.BaseClass;
+using System.Threading;
 
 namespace zk
 {
@@ -20,7 +21,9 @@ namespace zk
         public static string client_type = "";  //客户端类型
         public static Queue<RSData> receiveMessageQueue = new Queue<RSData>();         //消息接收队列
         public static Queue<RSData> sendMessageQueue = new Queue<RSData>();            //消息发送队列
-        public static List<OrderInfo> tbh_ordersInfoList = new List<OrderInfo>();                             //存放未处理完成的所有调度令的信息
+        public static List<OrderInfo> tbh_ordersInfoList = new List<OrderInfo>();                       //存放未处理完成的所有调度令的信息
+
+        public static Thread messageHandle_thread;
 
         public static void GlobalVarForAppInitial()
         {

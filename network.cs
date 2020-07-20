@@ -84,13 +84,14 @@ namespace zk
                             GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));       //获取有效数据
                             message = message.Substring(a + 7);
                             //form1tmp.messageHandle();
-                            //netandorder.HandleTheMessageReceive();
+                            //netandorder.HandleTheMessageReceive();  //处理
                         }
                         catch (Exception e)
                         {
                             MessageBox.Show(e.Message);
                         }
                     }
+                    GlobalVarForApp.messageHandle_thread.Interrupt();
                 }
                 return;
             }
