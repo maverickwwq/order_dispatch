@@ -123,7 +123,7 @@ namespace zk
             return oitmp;
         }
 
-
+        //对接收到的数据进行处理
         public static void HandleTheMessageReceive()
         {
             RSData rcv_rsd = new RSData();
@@ -133,8 +133,8 @@ namespace zk
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
                 {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
                     //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
+                    
                     rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
-
                     switch (rcv_rsd.CommType.Trim())
                     {
                         case "LOGIN_REPLY":
@@ -147,13 +147,21 @@ namespace zk
                             break;
 
                         case "DOWN_ORDER_REPLY":
-                            MessageBox.Show("Down order reply");
+                            //MessageBox.Show("Down order reply");
+                            //接收到服务器发送的接收调度令确认数据
+                            //1、 确认是否与客户端存在的调度令数据一致，不一致以
+                            //         这次接收的数据为准
+                            //2、    客户端不存在该调度令的数据，将数据存入全局变量tbh_ordersInfoList
+                            //3、  对tbh_ordersInfoList进行排序
                             tmpOI.commTime = rcv_rsd.CommTime;
                             tmpOI.orderInfo = rcv_rsd.order;
                             tmpOI.infoReturn = rcv_rsd.infoReturn;
-
-
                             tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
+                            /* //已经存在该调度令，用最新的数据覆盖该调度令
+                           if()
+                           {
+                           }
+                            */
                             GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
                             //对orInfo全局变量按调度令号进行排序
                             if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)

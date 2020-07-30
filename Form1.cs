@@ -23,6 +23,7 @@ namespace zk
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            orderHistory_btn.Text = "历史调度令查询";
             //界面标题数组 标题宽度
             String[] title_UI = {"序号","单号","日常","机房","状态","时间"};
             int[] title_UI_width = {30,100,30,30,100,100 };
@@ -309,6 +310,12 @@ namespace zk
             //network.listenSocket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
             System.Environment.Exit(0);
         }
+
+        private void orderHistory_btn_Click(object sender, EventArgs e)
+        {
+            
+        }
+
 
     }
 }

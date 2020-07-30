@@ -137,8 +137,8 @@ namespace zk
             voiceReminder.speakerIni();
 
             //开启数据处理线程，处理网络接收的数据包
-            messageHandle_thread = new Thread(netandorder.HandleTheMessageReceive);
-            messageHandle_thread.Start();
+            GlobalVarForApp.messageHandle_thread = new Thread(netandorder.HandleTheMessageReceive);
+            GlobalVarForApp.messageHandle_thread.Start();
         return true;
         }
 

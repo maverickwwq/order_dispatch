@@ -8,3 +8,4 @@ C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.Form1.resources
 C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.csprojResolveAssemblyReference.cache
 C:\Users\jc\Desktop\王伟强\proj\zk\zk\bin\Debug\Newtonsoft.Json.dll
 C:\Users\jc\Desktop\王伟强\proj\zk\zk\bin\Debug\zk.exe.config
+C:\Users\jc\Desktop\王伟强\proj\zk\zk\obj\x86\Debug\zk.orderHistoryQuery.resources

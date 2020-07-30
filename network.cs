@@ -100,12 +100,12 @@ namespace zk
             {
                 GlobalVarForApp.sendMessageQueue.Enqueue(dataToSend);
                 //sendDataThread is running ?
-                while (sendDataThread.ThreadState == ThreadState.Running)  //is running
+                /*while (sendDataThread.ThreadState == ThreadState.Running)  //is running
                 {
                     Thread.Sleep(100);
                     //Console.WriteLine("rotate");
                     //Console.WriteLine(sendDataThread.ThreadState);
-                }
+                }*/
                 sendDataThread.Interrupt();
             }
 

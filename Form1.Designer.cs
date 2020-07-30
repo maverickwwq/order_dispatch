@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.tbd_OrderInfo_dgv = new System.Windows.Forms.DataGridView();
+            this.orderHistory_btn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.tbd_OrderInfo_dgv)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,11 +46,22 @@
             this.tbd_OrderInfo_dgv.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.tbd_OrderInfo_dgv_RowEnter);
             this.tbd_OrderInfo_dgv.MouseLeave += new System.EventHandler(this.mouseLeaveOrderInfoDGV);
             // 
+            // orderHistory_btn
+            // 
+            this.orderHistory_btn.Location = new System.Drawing.Point(793, 37);
+            this.orderHistory_btn.Name = "orderHistory_btn";
+            this.orderHistory_btn.Size = new System.Drawing.Size(126, 23);
+            this.orderHistory_btn.TabIndex = 1;
+            this.orderHistory_btn.Text = "button1";
+            this.orderHistory_btn.UseVisualStyleBackColor = true;
+            this.orderHistory_btn.Click += new System.EventHandler(this.orderHistory_btn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 580);
+            this.ClientSize = new System.Drawing.Size(939, 580);
+            this.Controls.Add(this.orderHistory_btn);
             this.Controls.Add(this.tbd_OrderInfo_dgv);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -62,6 +74,7 @@
         #endregion
 
         private System.Windows.Forms.DataGridView tbd_OrderInfo_dgv;
+        private System.Windows.Forms.Button orderHistory_btn;
 
     }
 }
