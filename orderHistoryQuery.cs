@@ -15,5 +15,15 @@ namespace zk
         {
             InitializeComponent();
         }
+
+        private void orderHistoryQuery_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabPage1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
