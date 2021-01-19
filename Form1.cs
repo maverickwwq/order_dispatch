@@ -313,8 +313,8 @@ namespace zk
 
         private void orderHistory_btn_Click(object sender, EventArgs e)
         {
-            order_history_query order_query_form = new order_history_query();
-            order_query_form.Show();
+            //order_history_query order_query_form = new order_history_query();
+            //order_query_form.Show();
         }
 
 

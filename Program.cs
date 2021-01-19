@@ -11,7 +11,6 @@ using DispatchServer.BaseClass;
 
 namespace zk
 {
-
     static class Program
     {
         /// <summary>
@@ -29,6 +28,7 @@ namespace zk
             Form1 f=new Form1();
             System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
+            //界面刷新定时器
             UI_refresh_timer.Elapsed += f.UIrefresh;
             UI_refresh_timer.AutoReset = true;
             UI_refresh_timer.Enabled = true;
