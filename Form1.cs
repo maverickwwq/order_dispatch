@@ -70,8 +70,16 @@ namespace zk
         public delegate void UI_refresh_delegate();
         public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
         {                                                                                                         //同时不会产生错误
-          tbd_OrderInfo_dgv.BeginInvoke(new UI_refresh_delegate(tbd_OrderInfo_display)); 
-          
+#if _debug_
+            Console.WriteLine("界面刷新");
+#endif
+            try
+            {
+                tbd_OrderInfo_dgv.BeginInvoke(new UI_refresh_delegate(tbd_OrderInfo_display));
+            }
+            catch (Exception)
+            {
+            }
         }
 
         //------------------------------------------------------------------------------------------------

@@ -16,10 +16,10 @@ namespace zk
 {
     class network
     {
-   static private int svr_port = 0;        //服务器端口号
+            static private int svr_port = 0;        //服务器端口号
             static private string svr_ip = "";      //服务器ip地址
             static public Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);   //tcp连接socket
-            static private UTF8Encoding u8 =new UTF8Encoding();      
+            static private UTF8Encoding u8 =new UTF8Encoding();
 
             static private ThreadStart listenOnPortThreadDelegate = new ThreadStart(network.receiveDataProc);   //接收数据函数
             static private Thread receiveDataThread = new Thread(listenOnPortThreadDelegate);                             //接收数据线程
@@ -30,13 +30,13 @@ namespace zk
 
             static public bool networkInitialize(object f)  //初始化网络
             {
-                form1tmp = (Form1)f;
+                //form1tmp = (Form1)f;
                 svr_port = GlobalVarForApp.server_port;     //获取配置信息
                 svr_ip = GlobalVarForApp.server_ip;
                 bool state = true;
                 try
                 {
-                    listenSocket.Connect(new IPEndPoint(IPAddress.Parse(svr_ip), svr_port));//连接服务器
+                    listenSocket.Connect(new IPEndPoint(IPAddress.Parse(svr_ip), svr_port));  //连接服务器
                 }
                 catch (Exception e)
                 {
@@ -47,6 +47,12 @@ namespace zk
                 {
                     receiveDataThread.Start();      //开启接收线程
                     sendDataThread.Start();          //开启发送接收线程
+                    Console.WriteLine("没有我吗？？？？");
+
+#if _debug_
+                    Console.WriteLine("--------------接收线程开启");
+                    Console.WriteLine("--------------发送线程开启");
+#endif
                 }
                 return state;
             }
@@ -72,9 +78,11 @@ namespace zk
                     }
                     catch (Exception exc){
                         GlobalVarForApp.networkStatusBool = false;
-                        MessageBox.Show("网络中断");
+#if _debug_
+                        Console.WriteLine("listenSocket.Receive函数异常,可能是网络中断");
+#endif
                         appLog.exceptionRecord("网络中断" + exc.Message);
-                    }  
+                    }
                     message = message.Trim()+u8.GetString(messageBuf,0,messageCount).Trim();
                     a = message.IndexOf("DataEnd");                                         //数据是否有DataEnd
                     if (a != -1)                       //数据中存在DataEnd
@@ -146,7 +154,7 @@ namespace zk
             }
 
 
-            //        public bool sendData(Socket 
+            //        public bool sendData(Socket
 /*
             public static void thread(Object f)
             {

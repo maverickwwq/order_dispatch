@@ -227,7 +227,13 @@ namespace zk
                     }
                     // }
                 }
-                Thread.Sleep(Timeout.Infinite);
+                try
+                {
+                    Thread.Sleep(Timeout.Infinite);
+                }
+                catch (ThreadInterruptedException)
+                {
+                }
             }
         }
 

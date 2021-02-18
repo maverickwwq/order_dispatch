@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define   _debug_
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -6,6 +8,8 @@ using DispatchServer;
 using System.Threading;
 using System.Configuration;
 using DispatchServer.BaseClass;
+
+
 
 //这个项目是中控机房的客户端
 
@@ -16,7 +20,7 @@ namespace zk
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
-        /// 
+        ///
         //
 
         [STAThread]
@@ -24,14 +28,18 @@ namespace zk
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-           
+
             Form1 f=new Form1();
             System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
+            // Hook up the Elapsed event for the timer.
             //界面刷新定时器
             UI_refresh_timer.Elapsed += f.UIrefresh;
             UI_refresh_timer.AutoReset = true;
             UI_refresh_timer.Enabled = true;
+
+#if _debug_
+            Console.WriteLine("--------------界面刷新线程开启");
+#endif
             if (program_initial(f) == false)
             {
                 MessageBox.Show("系统初始化失败，无法启动");
@@ -47,7 +55,7 @@ namespace zk
 
             //  ---------------------------丢弃QUERY_ORDERS_REPLY之前的所有数据包------------------------
             RSData rsd_tmp = new RSData();//get one QUERY_ORDERS_REPLY
-            while(true){                                        
+            while(true){
                 if(GlobalVarForApp.receiveMessageQueue.Count()>0){
                     rsd_tmp=GlobalVarForApp.receiveMessageQueue.Dequeue();
                     if (rsd_tmp.CommType == "QUERY_ORDERS_REPLY")      //丢弃所有包，直到QUERY_ORDERS_REPLY
@@ -117,12 +125,15 @@ namespace zk
             //初始化全局变量
             GlobalVarForApp.receiveMessageQueue.Clear();    //消息接收队列
             GlobalVarForApp.sendMessageQueue.Clear();        //消息发送队列
-            GlobalVarForApp.tbh_ordersInfoList.Clear();             //存放未处理完成的所有调度令的信息                 
-            
+            GlobalVarForApp.tbh_ordersInfoList.Clear();             //存放未处理完成的所有调度令的信息
+
             //网络连接正常？
             if (network.networkInitialize(f) == true)                       //网络正常，正常则启动发送、接收线程
             {
                 //do something
+#if _debug_
+                Console.WriteLine("网络正常");
+#endif
                 GlobalVarForApp.networkStatusBool = true;
             }
             else
@@ -132,13 +143,16 @@ namespace zk
                 appLog.exceptionRecord("配置文件读取失败,程序无法启动");
                 return false;
             }
-            
+
             //初始化声音提示模块
             voiceReminder.speakerIni();
 
             //开启数据处理线程，处理网络接收的数据包
             GlobalVarForApp.messageHandle_thread = new Thread(netandorder.HandleTheMessageReceive);
             GlobalVarForApp.messageHandle_thread.Start();
+ #if _debug_
+                Console.WriteLine("--------------数据处理线程开启");
+#endif
         return true;
         }
 
