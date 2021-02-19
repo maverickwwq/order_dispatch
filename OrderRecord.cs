@@ -9,76 +9,75 @@ namespace DispatchServer
 {
     public class OrderRecord
     {
-        public int OD_NUM_ID;//调度指令序列号
-        public int OD_ID;//调度令号
-        public int DOWN_COUNT;//下发次数
-        public string DISPATCH_ORDER_STATUS;//分发系统的调令状态
-        public string DISPATCH_DOWN_TIME;//分发系统下发时间
-        public string DOWN_PERSON;//中控下发人
-        public string RECEIVE_DEPT;//接收部门
-        public string RECEIVE_TIME;//机房接收时间
-        public string RECEIVE_PERSON;//接收人
-        public string INEXE_REASON;//不可执行原因
-        public string BROADCAST_TIME;//开启时间
-        public string FEEDBACK_TIME;//反馈时间
-        public string FEEDBACK_PERSON;//反馈人员
-        public string TRACK_INFO;//调度指令跟踪信息
-        public string receive_deptStr;//接收部门显示
+        public int ID;//ID
+        public int orderId;//调度令ID
+        public int orderNumId;//调度指令ID
+        public int downCount;//下发次数
+        public string dispatchOrderStatus;//分发系统调令状态
+        public string dispatchDownTime;//分发系统下发时间
+        public string receiveDept;//接收部门
+        public string clientReceiveTime;//客户端接收时间
+        public string deptConfirmTime;//部门确认时间
+        public string deptConfirmPerson;//部门确认人员
+        public string inexeReason;//不可执行原因
+        public string deptFeedbackTime;//反馈时间
+        public string deptFeedbackPerson;//反馈人员
+        public string broadcastTime;//开启时间
+        public string trackInfo;//调度指令跟踪信息
 
         public OrderRecord()
         {
-            OD_NUM_ID = -1;
-            OD_ID = -1;
-            DOWN_COUNT = 0;
-            DISPATCH_ORDER_STATUS = "";
-            DISPATCH_DOWN_TIME = "";
-            DOWN_PERSON = "";
-            RECEIVE_DEPT = "";
-            RECEIVE_TIME = "";
-            RECEIVE_PERSON = "";
-            INEXE_REASON = "";
-            BROADCAST_TIME = "";
-            FEEDBACK_TIME = "";
-            FEEDBACK_PERSON = "";
-            TRACK_INFO = "";
-            receive_deptStr = "";
+            ID = -1;
+            orderId=-1;//调度令ID
+            orderNumId=-1;//调度指令ID
+            downCount=-1;//下发次数
+            dispatchOrderStatus = null;//分发系统调令状态
+            dispatchDownTime=null;//分发系统下发时间
+            receiveDept = null;//接收部门
+            clientReceiveTime = null;//客户端接收时间
+            deptConfirmTime = null;//部门接收时间
+            deptConfirmPerson = null;//部门接收人员
+            inexeReason = null;//不可执行原因
+            deptFeedbackTime = null;//反馈时间
+            deptFeedbackPerson = null;//反馈人员
+            broadcastTime = null;//开启时间
+            trackInfo = null;//调度指令跟踪信息
         }
 
         public OrderRecord
             (
-            int OD_NUM_ID,
-            int OD_ID,
-            int DOWN_COUNT,
-            string DISPATCH_ORDER_STATUS,
-            string DISPATCH_DOWN_TIME,
-            string DOWN_PERSON,
-            string RECEIVE_DEPT,
-            string RECEIVE_TIME,
-            string RECEIVE_PERSON,
-            string INEXE_REASON,
-            string BROADCAST_TIME,
-            string FEEDBACK_TIME,
-            string FEEDBACK_PERSON,
-            string TRACK_INFO
+              int ID,//ID
+             int orderId,//调度令ID
+             int orderNumId,//调度指令ID
+             int downCount,//下发次数
+             string dispatchOrderStatus,//分发系统调令状态
+             string dispatchDownTime,//分发系统下发时间
+             string receiveDept,//接收部门
+             string clientReceiveTime,//客户端接收时间 
+             string deptConfirmTime,//部门确认时间
+             string deptConfirmPerson,//部门确认人员
+             string inexeReason,//不可执行原因
+             string deptFeedbackTime,//反馈时间
+             string deptFeedbackPerson,//反馈人员
+             string broadcastTime,//开启时间
+             string trackInfo//调度指令跟踪信息
             )
         {
-            this.OD_NUM_ID=OD_NUM_ID;
-            this.OD_ID=OD_ID;
-            this.DOWN_COUNT=DOWN_COUNT;
-            this.DISPATCH_ORDER_STATUS=DISPATCH_ORDER_STATUS;
-            this.DISPATCH_DOWN_TIME=DISPATCH_DOWN_TIME;
-            this.DOWN_PERSON=DOWN_PERSON;
-            this.RECEIVE_DEPT=RECEIVE_DEPT;
-            this.RECEIVE_TIME=RECEIVE_TIME;
-            this.RECEIVE_PERSON=RECEIVE_PERSON;
-            this.INEXE_REASON=INEXE_REASON;
-            this.BROADCAST_TIME=BROADCAST_TIME;
-            this.FEEDBACK_TIME=FEEDBACK_TIME;
-            this.FEEDBACK_PERSON=FEEDBACK_PERSON;
-            this.TRACK_INFO = TRACK_INFO;
-            CommUtil.dicDept.TryGetValue(RECEIVE_DEPT, out this.receive_deptStr);
+           this.ID =ID;
+           this.orderId = orderId;
+           this.orderNumId = orderNumId;
+           this.downCount = downCount;
+           this.dispatchOrderStatus = dispatchOrderStatus;
+           this.dispatchDownTime = dispatchDownTime;
+           this.receiveDept = receiveDept;
+           this.clientReceiveTime = clientReceiveTime;
+           this.deptConfirmTime = deptConfirmTime;
+           this.deptConfirmPerson = deptConfirmPerson;
+           this.inexeReason = inexeReason;
+           this.deptFeedbackTime = deptFeedbackTime;
+           this.deptFeedbackPerson = deptFeedbackPerson;
+           this.broadcastTime = broadcastTime;
+           this.trackInfo = trackInfo;
         }
-
-        
     }
 }
