@@ -23,16 +23,15 @@ namespace DispatchServer.BaseUtil
         public static readonly string COMM_TYPE_QUERY_USER_REQUEST = "QUERY_USER_REQUEST";//查询单个用户
         public static readonly string COMM_TYPE_QUERY_USERS_REQUEST = "QUERY_USERS_REQUEST";//批量用户查询结果
         public static readonly string COMM_TYPE_DOWN_ORDER = "DOWN_ORDER"; //服务器下发调令
-        public static readonly string COMM_TYPE_DOWN_ORDER_REQUEST = "DOWN_ORDER_REQUEST";//中控下发调令请求
-        public static readonly string COMM_TYPE_DOWN_ORDER_REPLY = "DOWN_ORDER_REPLY";//中控下发调令结果
+        public static readonly string COMM_TYPE_RECEIVE_ORDER_REPLY = "RECEIVE_ORDER_REPLY";//接收调令的反馈
         public static readonly string COMM_TYPE_DOWN_TELE_ORDER_REQUEST = "DOWN_TELE_ORDER_REQUEST";//下发电话调令请求
         public static readonly string COMM_TYPE_DOWN_TELE_ORDER = "DOWN_TELE_ORDER";//下发电话调令
-        public static readonly string COMM_TYPE_RECEIVE_ORDER = "RECEIVE_ORDER";//接收调令
-        public static readonly string COMM_TYPE_RECEIVE_ORDER_REPLY = "RECEIVE_ORDER_REPLY";//接收调令的答复
-        public static readonly string COMM_TYPE_RECEIVE_TELE_ORDER = "RECEIVE_TELE_ORDER";//接收电话调令
-        public static readonly string COMM_TYPE_FEEDBACK_ORDER = "FEEDBACK_ORDER";//反馈调令
-        public static readonly string COMM_TYPE_FEEDBACK_ORDER_REPLY = "FEEDBACK_ORDER_REPLY";//反馈调令的答复
-        public static readonly string COMM_TYPE_FEEDBACK_TELE_ORDER = "FEEDBACK_TELE_ORDER";//反馈电话调令
+        public static readonly string COMM_TYPE_CONFIRM_ORDER = "CONFIRM_ORDER";//确认调令
+        public static readonly string COMM_TYPE_CONFIRM_ORDER_REPLY = "COINFIRM_ORDER_REPLY";//确认调令的反馈
+        public static readonly string COMM_TYPE_CONFIRM_TELE_ORDER = "CONFIRM_TELE_ORDER";//确认电话调令
+        public static readonly string COMM_TYPE_FEEDBACK_ORDER = "FEEDBACK_ORDER";//执行回复调令
+        public static readonly string COMM_TYPE_FEEDBACK_ORDER_REPLY = "FEEDBACK_ORDER_REPLY";//执行回复调令的反馈
+        public static readonly string COMM_TYPE_FEEDBACK_TELE_ORDER = "FEEDBACK_TELE_ORDER";//执行回复电话调令的反馈
         public static readonly string COMM_TYPE_QUERY_ORDER_REQUEST = "QUERY_ORDER_REQUEST";//查询单个调令综合信息
         public static readonly string COMM_TYPE_QUERY_TELE_ORDER_REQUEST = "QUERY_TELE_ORDER_REQUEST";//查询单个电话调令综合信息
         public static readonly string COMM_TYPE_QUERY_ORDERS_REQUEST = "QUERY_ORDERS_REQUEST";//查询批量调令
@@ -49,8 +48,10 @@ namespace DispatchServer.BaseUtil
         public static readonly string COMM_TYPE_QUERY_DEBUGLOG_REPLY = "QUERY_DEBUGLOG_REPLY";//调试日志查询结果
         public static readonly string COMM_TYPE_QUERY_ERRORLOG_REQUEST = "QUERY_ERRORLOG_REQUEST";//错误日志查询
         public static readonly string COMM_TYPE_QUERY_ERRORLOG_REPLY = "QUERY_ERRORLOG_REPY";//错误日志查询结果
+        public static readonly string COMM_TYPE_REMIND_RECEIVE_ORDER = "REMIND_RECEIVE_ORDER";//提醒接收调令
+        public static readonly string COMM_TYPE_REMIND_FEEDBACK_ORDER = "REMIND_FEEDBACK_ORDER";//提醒反馈调令
         public static readonly string COMM_TYPE_NEW_MESSAGE = "NEW_MESSAGE";//新消息提醒
-
+        public static readonly string COMM_TYPE_CONNECT_STATE = "CONNECT_STATE";//连接状态信息
         //机房代码定义
         public static readonly string DEPT_JIA = "7830";//甲机房的机房代码
         public static readonly string DEPT_YI = "7831";//乙机房的机房代码
@@ -59,13 +60,16 @@ namespace DispatchServer.BaseUtil
         //调令状态
         public static readonly string ORDER_STATUS_WAIT_DOWN = "待下发";
         public static readonly string ORDER_STATUS_WAIT_RECEIVE = "待接收";
+        public static readonly string ORDER_STATUS_WAIT_CONFIRM = "待确认";
         public static readonly string ORDER_STATUS_WAIT_FEEDBACK = "待反馈";
         public static readonly string ORDER_STATUS_ALREADY_FEEDBACK = "已反馈";
 
         //常量对应字典
         public static Dictionary<string, string> dicDept = new Dictionary<string, string>();
-        public static Dictionary<string, string> dicTR = new Dictionary<string, string>();
-        public static Dictionary<string, string> dicAN = new Dictionary<string, string>();
+        public static Dictionary<string, string> dicTtoC = new Dictionary<string, string>();//发射机到代码的映射
+        public static Dictionary<string, string> dicCtoT = new Dictionary<string, string>();//代码到发射机的映射
+        public static Dictionary<string, string> dicCtoA = new Dictionary<string, string>();//代码到天线的映射
+        public static Dictionary<string, string> dicAtoC = new Dictionary<string, string>();//天线到代码的映射
         public static Dictionary<string, string> dicSourceType = new Dictionary<string, string>();
         public static Dictionary<string, string> dicIP = new Dictionary<string, string>();
         public static Dictionary<string, string> dicOrderType = new Dictionary<string, string>();
@@ -77,24 +81,46 @@ namespace DispatchServer.BaseUtil
             dicDept.Add(CommUtil.DEPT_JIA, "甲机房");
             dicDept.Add(CommUtil.DEPT_YI, "乙机房");
             dicDept.Add(CommUtil.DEPT_CENTER, "中控机房");
-            dicTR.Add("1", "A01");
-            dicTR.Add("2", "A02");
-            dicTR.Add("3", "A03");
-            dicTR.Add("4", "A04");
-            dicTR.Add("5", "A05");
-            dicTR.Add("6", "A06");
-            dicTR.Add("7", "B01");
-            dicAN.Add("1", "101");
-            dicAN.Add("2", "102");
-            dicAN.Add("3", "103");
-            dicAN.Add("4", "104");
-            dicAN.Add("5", "105");
-            dicAN.Add("6", "106");
-            dicAN.Add("7", "107");
-            dicTR.Add("8", "108");
-            dicAN.Add("9", "109");
-            dicAN.Add("10", "110");
-            dicAN.Add("11", "201");
+            dicTtoC.Add("A01", "783001");
+            dicTtoC.Add("A02", "783002");
+            dicTtoC.Add("A03", "783003");
+            dicTtoC.Add("A04", "783004");
+            dicTtoC.Add("A05", "783005");
+            dicTtoC.Add("A06", "783006");
+            dicTtoC.Add("B01", "783101");
+
+            dicCtoT.Add("783001", "A01");
+            dicCtoT.Add("783002", "A02");
+            dicCtoT.Add("783003", "A03");
+            dicCtoT.Add("783004", "A04");
+            dicCtoT.Add("783005", "A05");
+            dicCtoT.Add("783006", "A06");
+            dicCtoT.Add("783101", "B01");
+
+            dicCtoA.Add("78101", "101");
+            dicCtoA.Add("78102", "102");
+            dicCtoA.Add("78103", "103");
+            dicCtoA.Add("78104", "104");
+            dicCtoA.Add("78105", "105");
+            dicCtoA.Add("78106", "106");
+            dicCtoA.Add("78107", "107");
+            dicCtoA.Add("78108", "108");
+            dicCtoA.Add("78109", "109");
+            dicCtoA.Add("78110", "110");
+            dicCtoA.Add("78201", "201");
+
+            dicAtoC.Add("101", "78101");
+            dicAtoC.Add("102", "78102");
+            dicAtoC.Add("103", "78103");
+            dicAtoC.Add("104", "78104");
+            dicAtoC.Add("105", "78105");
+            dicAtoC.Add("106", "78106");
+            dicAtoC.Add("107", "78107");
+            dicAtoC.Add("108", "78108");
+            dicAtoC.Add("109", "78109");
+            dicAtoC.Add("110", "78110");
+            dicAtoC.Add("201", "78201");
+
             dicSourceType.Add("NORM","正常任务");
             dicSourceType.Add("INTR", "台际代播");
             dicSourceType.Add("INNR", "自台代播");
