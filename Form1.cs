@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define   _debug_
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -71,7 +72,7 @@ namespace zk
         public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
         {                                                                                                         //同时不会产生错误
 #if _debug_
-            Console.WriteLine("界面刷新");
+           // Console.WriteLine("界面刷新");
 #endif
             try
             {

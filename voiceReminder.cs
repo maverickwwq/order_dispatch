@@ -43,7 +43,7 @@ namespace zk
                 {
                     Thread.Sleep(Timeout.Infinite);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
             }

@@ -45,10 +45,13 @@ namespace zk
                 MessageBox.Show("系统初始化失败，无法启动");
                 return;
             }
-
-            Application.Run(f);
+            
             //用户登录
-
+#if _debug_
+            Console.WriteLine("初始化业务");
+            Console.WriteLine("获取所有未处理的调度令");
+#endif
+            Application.Run(f);
             //请求获取未处理订单
             //机房端未接收的，下发机房失败或者尚未下发，机房未反馈的三种状态
             netandorder.askForAllUnfinishedOrder_send();// waiting for server ,receive the "QUERY_ORDERS_REPLY"
@@ -57,8 +60,8 @@ namespace zk
             RSData rsd_tmp = new RSData();//get one QUERY_ORDERS_REPLY
             while(true){
                 if(GlobalVarForApp.receiveMessageQueue.Count()>0){
-                    rsd_tmp=GlobalVarForApp.receiveMessageQueue.Dequeue();
-                    if (rsd_tmp.CommType == "QUERY_ORDERS_REPLY")      //丢弃所有包，直到QUERY_ORDERS_REPLY
+                    rsd_tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();     //丢弃所有包
+                    if (rsd_tmp.CommType == "QUERY_ORDERS_REPLY")                     //直到QUERY_ORDERS_REPLY
                         break;
                 }
                 Thread.Sleep(1000);//wait for the data to be sent and receive
@@ -73,7 +76,7 @@ namespace zk
                     GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;              //获取文号
                     i++;
                 }
-                for (i = 0; i < GlobalVarForApp.tbh_ordersInfoList.Count(); i++)        //发送query_order_request，
+                for (i = 0; i < GlobalVarForApp.tbh_ordersInfoList.Count(); i++)     //发送query_order_request，
                 {                                                                                                          //请求获取所有未完成调度令的详细信息
                     Query query=new Query();
                     query.queryOrderODID=GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID.ToString();
@@ -101,9 +104,8 @@ namespace zk
                     Thread.Sleep(1000);
                 }
             }
-
-
-
+            Console.WriteLine("主线程在这里结束");
+            Thread.Sleep(Timeout.Infinite);
         }
 
         private static bool program_initial(object f)       //系统初始化   成功返回true 失败false

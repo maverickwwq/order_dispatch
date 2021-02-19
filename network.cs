@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define   _debug_
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,12 +44,10 @@ namespace zk
                     state = false;
                     appLog.exceptionRecord("网络初始化异常"+e.Message);
                 }
-                if(state ==true )       //网络正常，监听线程开启
+                if(state ==true )                           //网络正常，监听线程开启
                 {
                     receiveDataThread.Start();      //开启接收线程
                     sendDataThread.Start();          //开启发送接收线程
-                    Console.WriteLine("没有我吗？？？？");
-
 #if _debug_
                     Console.WriteLine("--------------接收线程开启");
                     Console.WriteLine("--------------发送线程开启");
@@ -145,7 +144,7 @@ namespace zk
                     {
                         Thread.Sleep(Timeout.Infinite);//发送数据队列为空，线程被阻止
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
 
                     }
