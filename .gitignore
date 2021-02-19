@@ -5,3 +5,5 @@
 *.Cache
 *.sln
 *.suo
+*.exe.config
+.gitignore
