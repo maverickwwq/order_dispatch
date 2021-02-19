@@ -52,6 +52,8 @@ namespace zk
             Console.WriteLine("获取所有未处理的调度令");
 #endif
             Application.Run(f);
+
+            /*
             //请求获取未处理订单
             //机房端未接收的，下发机房失败或者尚未下发，机房未反馈的三种状态
             netandorder.askForAllUnfinishedOrder_send();// waiting for server ,receive the "QUERY_ORDERS_REPLY"
@@ -106,6 +108,7 @@ namespace zk
             }
             Console.WriteLine("主线程在这里结束");
             Thread.Sleep(Timeout.Infinite);
+             */
         }
 
         private static bool program_initial(object f)       //系统初始化   成功返回true 失败false

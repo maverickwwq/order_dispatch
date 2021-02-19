@@ -9,163 +9,267 @@ namespace DispatchServer
 {
     public class OrderOp
     {
-        public int OD_NUM_ID;//指令序号
-        public int OD_ID;//调度令序号
-        public int NUM;//调度指令序号
-        public string ORDER_TYPE;//任务类型
-        public int TR_ID;//发射机序号
-        public int AN_ID;//天线序号
-        public string START_DATE;//开始执行日期
-        public string END_DATE;//结束执行日期
-        public string START_TIME;//开始播音时间
-        public string END_TIME;//结束播音时间
-        public int FREQ;//频率
-        public int POWER;//功率
-        public int PG_ID;//节目序号
-        public string AZIMUTH_M;//方向
-        public string AZIMUTH_DE;//偏向
-        public string ANT_PROG;//
-        public string OPERATE;//操作，0-停，1-开
-        public int TARGET;//对象台
-        public string SERV_AREA;//服务区
-        public string DAYS;//周期
-        public string MSG_NUM;//需求文号
-        public string CHANNEL;//节目通道
-        public string SEASON;//季节
-        public string MOD;//调制方式
-        public string RMKS;//备注
-        public string STATUS;//状态
-        public string STATUS_DATE;//状态日期
-        public string INEXE_REASON_CODE;//不可执行原因
-        public string INEXE_PERSON;//机房确认人
-        public string BROADCAST_TIME;
-        public string INNER_INSTEAD_TASK_INFO;
-        public string INS_ST_CODE;
-        public string INS_TRANS_USED_CODE;
+        public int ID;
+        public int orderId;//调度令ID
+        public int orderYear;//年份
+        public string orderCode;//文号
+        public string sourceType;//调度令性质
+        public string orderStatus;//调度令状态
+        public string orderStatusDate;//状态日期
+        public string sender;//发送人
+        public string sendDate;//发送时间
+        public string sendAccessor;//发送审核人
+        public string sendDept;//发送单位
+        public string receiver;//台站接收人
+        public string receiveDate;//台站接收时间
+        public string corrector;//台站校对人
+        public string correctDate;//台站校对时间
+        public string orderRmks;//备注
+        public string createType;//创建类型
+        public string orderFormat;//任务格式
+        public string flagReply;//可执行反馈
+        public string replyDate;//可执行反馈时间
+        public string insteadFlag;
+        public int insteadId;
+        public int orderNumId;
+        public int num;//调度指令数
+        public string orderType;//任务类型
+        public string transCode;//发射机代码
+        public string antennaCode;//天线代码
+        public string startDate;//开始执行日期
+        public string endDate;//结束执行日期
+        public string startTime;//开始执行时间
+        public string endTime;//结束执行时间
+        public int freq;//频率
+        public int power;//功率
+        public string programCode;//节目代码
+        public string programName;//节目名称
+        public string azimuthM;//天线方向
+        public string azimuthDe;//天线偏向
+        public string operate;//操作，0-停，1-开
+        public int target;//对象台
+        public string servArea;//服务区
+        public string days;//周期
+        public string msgNum;//需求文号
+        public string channel;//节目通道
+        public string season;//季节
+        public string mod;//调制方式
+        public string opRmks;
+        public string opStatus;//调度指令状态
+        public string opStatusDate;//调度指令状态日期
+        public string inexeReasonCode;//不可执行原因
+        public string inexePerson;//机房确认人
+        public string antProg;
+        public string broadcastTime;
+        public string innerTaskInsteadInfo;
+        public string insteadStationCode;
+        public string insteadTransUsedCode;
+        public string updateTime;
+        public int dealed;
+        public string operation;
 
-        public string orderTypeDisplay;//任务类型显示
+        public string orderCodeDisplay;//完整调令号
+        public string operateDisplay;//操作显示
         public string trDisplay;//发射机显示
         public string anDisplay;//天线号显示
-        public string operateDisplay;//操作显示
-        public string omsStatusDisplay;//调令状态显示
+        public string orderTypeDisplay;//任务类型显示
+        public string freqStr;//该调度令所有频率
+        public string trStr;//该调度令所有发射机
+        public string anStr;//该调度令所有天线
 
         public OrderOp()
         {
-            OD_NUM_ID = -1;
-            OD_ID = -1;
-            NUM = -1;
-            ORDER_TYPE = "";
-            TR_ID = -1;
-            AN_ID = -1;
-            START_DATE = "";
-            END_DATE = "";
-            START_TIME = "";
-            END_TIME = "";
-            FREQ = -1;
-            POWER = -1;
-            PG_ID = -1;
-            AZIMUTH_M = "";
-            AZIMUTH_DE = "";
-            ANT_PROG = "";
-            OPERATE = "";
-            TARGET = -1;
-            SERV_AREA = "";
-            DAYS = "";
-            MSG_NUM = "";
-            CHANNEL = "";
-            SEASON = "";
-            MOD = "";
-            RMKS = "";
-            STATUS = "";
-            STATUS_DATE = "";
-            INEXE_REASON_CODE = "";
-            INEXE_PERSON = "";
-            orderTypeDisplay="";
-            trDisplay="";
-            anDisplay="";
-            operateDisplay="";
-            omsStatusDisplay = "";
+            ID=-1;
+            orderId=-1;
+            orderYear=-1;
+            orderCode=null;
+            sourceType = null;
+            orderStatus = null;
+            orderStatusDate = null;
+            sender = null;
+            sendDate = null;
+            sendAccessor = null;
+            sendDept = null;
+            receiver = null;
+            receiveDate = null;
+            corrector = null;
+            correctDate = null;
+            orderRmks = null;
+            createType = null;
+            orderFormat = null;
+            flagReply = null;
+            replyDate = null;
+            insteadFlag=null;
+            insteadId=-1;
+            orderNumId=-1;
+            num=-1;
+            orderType = null;
+            transCode = null;
+            antennaCode = null;
+            startDate = null;
+            endDate = null;
+            startTime = null;
+            endTime = null;
+            freq=-1;
+            power=-1;
+            programCode = null;
+            programName = null;
+            azimuthM = null;
+            azimuthDe = null;
+            operate = null;
+            target=-1;
+            servArea = null;
+            days = null;
+            msgNum = null;
+            channel = null;
+            season = null;
+            mod = null;
+            opRmks = null;
+            opStatus = null;
+            opStatusDate = null;
+            inexeReasonCode = null;
+            inexePerson = null;
+            antProg = null;
+            broadcastTime = null;
+            innerTaskInsteadInfo = null;
+            insteadStationCode = null;
+            insteadTransUsedCode = null;
+            updateTime = null;
+            dealed=-1;
+            operation = null;
+
+            orderCodeDisplay = null;
+            operateDisplay = null;
+            trDisplay = null;
+            anDisplay = null;
+            orderTypeDisplay = null;
+            freqStr = null;
+            trStr = null;
+            anStr = null;
         }
 
-        public OrderOp
-            (
-             int OD_NUM_ID,
-             int OD_ID,
-             int NUM,
-             string ORDER_TYPE,
-             int TR_ID,
-             int AN_ID,
-             string START_DATE,
-             string END_DATE,
-             string START_TIME,
-             string END_TIME,
-             int FREQ,
-             int POWER,
-             int PG_ID,
-             string AZIMUTH_M,
-             string AZIMUTH_DE,
-             string ANT_PROG,
-             string OPERATE,
-             int TARGET,
-             string SERV_AREA,
-             string DAYS,
-             string MSG_NUM,
-             string CHANNEL,
-             string SEASON,
-             string MOD,
-             string RMKS,
-             string STATUS,
-             string STATUS_DATE,
-             string INEXE_REASON_CODE,
-             string INEXE_PERSON,
-             string BROADCAST_TIME,
-             string INNER_INSTEAD_TASK_INFO,
-             string INS_ST_CODE,
-             string INS_TRANS_USED_CODE
+        public OrderOp(
+             int ID,
+             int orderId,
+             int orderYear,
+             string orderCode,
+             string sourceType,
+             string orderStatus,
+             string orderStatusDate,
+             string sender,
+             string sendDate,
+             string sendAccessor,
+             string sendDept,
+             string receiver,
+             string receiveDate,
+             string corrector,
+             string correctDate,
+             string orderRmks,
+             string createType,
+             string orderFormat,
+             string flagReply,
+             string replyDate,
+             string insteadFlag,
+             int insteadId,
+             int orderNumId,
+             int num,
+             string orderType,
+             string transCode,
+             string antennaCode,
+             string startDate,
+             string endDate,
+             string startTime,
+             string endTime,
+             int freq,
+             int power,
+             string programCode,
+             string programName,
+             string azimuthM,
+             string azimuthDe,
+             string operate,
+             int target,
+             string servArea,
+             string days,
+             string msgNum,
+             string channel,
+             string season,
+             string mod,
+             string opRmks,
+             string opStatus,
+             string opStatusDate,
+             string inexeReasonCode,
+             string inexePerson,
+             string antProg,
+             string broadcastTime,
+             string innerTaskInsteadInfo,
+             string insteadStationCode,
+             string insteadTransUsedCode,
+             string updateTime,
+             int dealed,
+             string operation
             )
         {
-            this.OD_NUM_ID = OD_NUM_ID;
-            this.OD_ID=OD_ID;
-            this.NUM=NUM;
-            this.ORDER_TYPE=ORDER_TYPE;
-            this.TR_ID=TR_ID;
-            this.AN_ID=AN_ID;
-            this.START_DATE=START_DATE;
-            this.END_DATE=END_DATE;
-            this.START_TIME=START_TIME;
-            this.END_TIME=END_TIME;
-            this.FREQ=FREQ;
-            this.POWER=POWER;
-            this.PG_ID=PG_ID;
-            this.AZIMUTH_M=AZIMUTH_M;
-            this.AZIMUTH_DE=AZIMUTH_DE;
-            this.ANT_PROG=ANT_PROG;
-            this.OPERATE=OPERATE;
-            this.TARGET=TARGET;
-            this.SERV_AREA=SERV_AREA;
-            this.DAYS=DAYS;
-            this.MSG_NUM=MSG_NUM;
-            this.CHANNEL=CHANNEL;
-            this.SEASON=SEASON;
-            this.MOD=MOD;
-            this.RMKS=RMKS;
-            this.STATUS=STATUS;
-            this.STATUS_DATE=STATUS_DATE;
-            this.INEXE_REASON_CODE=INEXE_REASON_CODE;
-            this.INEXE_PERSON=INEXE_PERSON;
-            this.BROADCAST_TIME=BROADCAST_TIME;
-            this.INNER_INSTEAD_TASK_INFO=INNER_INSTEAD_TASK_INFO;
-            this.INS_ST_CODE=INS_ST_CODE;
-            this.INS_TRANS_USED_CODE=INS_TRANS_USED_CODE;
-
-            CommUtil.dicOrderType.TryGetValue(ORDER_TYPE, out orderTypeDisplay);
-            //CommUtil.dicTR.TryGetValue(TR_ID.ToString(), out trDisplay);
-            //CommUtil.dicAN.TryGetValue(AN_ID.ToString(), out anDisplay);
-            if (this.OPERATE.Equals("0"))
-                operateDisplay = "停";
-            else if (this.OPERATE.Equals("1"))
-                operateDisplay = "开";
-            CommUtil.dicOmsOrderOpStatus.TryGetValue(STATUS,out omsStatusDisplay);
+            this.ID=ID;
+            this.orderId = orderId;
+            this.orderYear=orderYear;
+            this.orderCode="广无调单字【"+orderYear+"】"+orderCode+"号";
+            CommUtil.dicSourceType.TryGetValue(sourceType,out this.sourceType);
+            this.orderStatus=orderStatus;
+            this.orderStatusDate = orderStatusDate;
+            this.sender=sender;
+            this.sendDate=sendDate;
+            this.sendAccessor=sendAccessor;
+            this.sendDept=sendDept;
+            this.receiver=receiver;
+            this.receiveDate=receiveDate;
+            this.corrector=corrector;
+            this.correctDate=correctDate;
+            this.orderRmks=orderRmks;
+            this.createType=createType;
+            this.orderFormat=orderFormat;
+            this.flagReply=flagReply;
+            this.replyDate=replyDate;
+            this.insteadFlag=insteadFlag;
+            this.insteadId=insteadId;
+            this.orderNumId=orderNumId;
+            this.num=num;
+            CommUtil.dicOrderType.TryGetValue(orderType,out this.orderType);
+            CommUtil.dicCtoT.TryGetValue(transCode,out this.transCode);
+            CommUtil.dicCtoA.TryGetValue(antennaCode,out this.antennaCode);
+            this.startDate=startDate;
+            this.endDate=endDate;
+            this.startTime=startTime;
+            this.endTime=endTime;
+            this.freq=freq;
+            this.power=power;
+            this.programCode=programCode;
+            this.programName=programName;
+            this.azimuthM=azimuthM;
+            this.azimuthDe=azimuthDe;
+            if (operate.Equals("0"))
+                this.operate = "停";
+            else if (operate.Equals("1"))
+                this.operate = "开";
+            this.target=target;
+            this.servArea=servArea;
+            this.days=days;
+            this.msgNum=msgNum;
+            this.channel=channel;
+            this.season=season;
+            this.mod=mod;
+            this.opRmks=opRmks;
+            this.opStatus=opStatus;
+            this.opStatusDate=opStatusDate;
+            this.inexeReasonCode=inexeReasonCode;
+            this.inexePerson=inexePerson;
+            this.antProg=antProg;
+            this.broadcastTime=broadcastTime;
+            this.innerTaskInsteadInfo=innerTaskInsteadInfo;
+            this.insteadStationCode=insteadStationCode;
+            this.insteadTransUsedCode=insteadTransUsedCode;
+            this.updateTime=updateTime;
+            this.dealed=dealed;
+            this.operation=operation;
         }
     }
 }

@@ -99,7 +99,7 @@ namespace zk
                     tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
                     tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[0].Value = (ordersCount+1).ToString();        //第一列 序号 按调度令增序排列
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderInfo.ORDER_YEAR+" "+ tmpOrInfo.orderInfo.ORDER_CODE;//第二列调度令号
+                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderInfo.ORDER_YEAR+" "+ tmpOrInfo.orderInfo.ORDER_CODE;//第二列调度令号
 /*
                     tmp = "";
                     switch (tmpOrInfo.orderInstructionList[0].TR_ID)
