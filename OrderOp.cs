@@ -159,8 +159,8 @@ namespace DispatchServer
             this.INS_TRANS_USED_CODE=INS_TRANS_USED_CODE;
 
             CommUtil.dicOrderType.TryGetValue(ORDER_TYPE, out orderTypeDisplay);
-            CommUtil.dicTR.TryGetValue(TR_ID.ToString(), out trDisplay);
-            CommUtil.dicAN.TryGetValue(AN_ID.ToString(), out anDisplay);
+            //CommUtil.dicTR.TryGetValue(TR_ID.ToString(), out trDisplay);
+            //CommUtil.dicAN.TryGetValue(AN_ID.ToString(), out anDisplay);
             if (this.OPERATE.Equals("0"))
                 operateDisplay = "停";
             else if (this.OPERATE.Equals("1"))

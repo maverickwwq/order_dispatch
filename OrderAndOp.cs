@@ -81,15 +81,15 @@ namespace DispatchServer.BaseClass
                 {
                     if(anStr.Equals(""))
                     {
-                        CommUtil.dicAN.TryGetValue(an[k], out anStr);
-                        CommUtil.dicTR.TryGetValue(k.ToString(), out trStr);
+                        //CommUtil.dicAN.TryGetValue(an[k], out anStr);
+                        //CommUtil.dicTR.TryGetValue(k.ToString(), out trStr);
                     } 
                     else
                     {
                         string tempStr = "";
-                        CommUtil.dicAN.TryGetValue(an[k], out tempStr);
+                        //CommUtil.dicAN.TryGetValue(an[k], out tempStr);
                         anStr += "," + tempStr;
-                        CommUtil.dicTR.TryGetValue(k.ToString(), out tempStr);
+                        //CommUtil.dicTR.TryGetValue(k.ToString(), out tempStr);
                         trStr += "," + tempStr;
                     }
                 }
