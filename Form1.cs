@@ -218,12 +218,13 @@ namespace zk
         //排序函数   对消息队列的调度令进行排序，按调令文号增序排列
         private static int CompareOrderByOrderID(OrderInfo a, OrderInfo b)
         {
-            if (a.orderInfo.OD_ID > b.orderInfo.OD_ID)
+/*            if (a.orderInfo.OD_ID > b.orderInfo.OD_ID)
                 return 1;
             else if (a.orderInfo.OD_ID < b.orderInfo.OD_ID)
                 return -1;
-            else
+            else */
                 return 0;
+
         }
 
         public void messageHandle()

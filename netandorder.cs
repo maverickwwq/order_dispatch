@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define _debug_
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -132,8 +133,8 @@ namespace zk
             {
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
                 {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
-                    //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
-                    
+                                //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
+
                     rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
                     switch (rcv_rsd.CommType.Trim())
                     {
@@ -168,7 +169,7 @@ namespace zk
                             {
                                 //GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
                             }
-                            //od_dis.od_dis_show();            //新调度令显示                           
+                            //od_dis.od_dis_show();            //新调度令显示
                             // Form1.tbd_OrderInfo_display();
 
                             //
@@ -190,9 +191,9 @@ namespace zk
                                     int i = 0;
                                     foreach (OrderAndOp tmpOao in tmpOaoList)//获取所有未完成调度令的od_id  od_year od_code
                                     {
-                                        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);
-                                        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);
-                                        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;
+                                        //GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);
+                                        //GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);
+                                       //GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;
                                         i++;
                                     }
                                 }

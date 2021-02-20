@@ -45,7 +45,7 @@ namespace zk
                 MessageBox.Show("系统初始化失败，无法启动");
                 return;
             }
-            
+
             //用户登录
 #if _debug_
             Console.WriteLine("初始化业务");
@@ -128,6 +128,7 @@ namespace zk
                 return false;
             }
             //初始化全局变量
+            GlobalVarForApp.GlobalVarForAppInitial();
             GlobalVarForApp.receiveMessageQueue.Clear();    //消息接收队列
             GlobalVarForApp.sendMessageQueue.Clear();        //消息发送队列
             GlobalVarForApp.tbh_ordersInfoList.Clear();             //存放未处理完成的所有调度令的信息
@@ -139,7 +140,6 @@ namespace zk
 #if _debug_
                 Console.WriteLine("网络正常");
 #endif
-                GlobalVarForApp.networkStatusBool = true;
             }
             else
             {

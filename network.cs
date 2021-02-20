@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 using DispatchServer;
 using System.Threading;
 
-
 namespace zk
 {
     class network
@@ -21,17 +20,17 @@ namespace zk
             static private string svr_ip = "";      //服务器ip地址
             static public Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);   //tcp连接socket
             static private UTF8Encoding u8 =new UTF8Encoding();
-
             static private ThreadStart listenOnPortThreadDelegate = new ThreadStart(network.receiveDataProc);   //接收数据函数
-            static private Thread receiveDataThread = new Thread(listenOnPortThreadDelegate);                             //接收数据线程
-            static private ThreadStart sendDataThreadDelegate = new ThreadStart(network.sendRSDataProc);      //发送数据函数
-            static private Thread sendDataThread = new Thread(sendDataThreadDelegate);                                       //发送数据线程
-            static private Form1 form1tmp=new Form1();
+            static private Thread receiveDataThread = new Thread(listenOnPortThreadDelegate);                   //接收数据线程
+            static private ThreadStart sendDataThreadDelegate = new ThreadStart(network.sendRSDataProc);        //发送数据函数
+            static private Thread sendDataThread = new Thread(sendDataThreadDelegate);                          //发送数据线程
+            //static private Form1 form1tmp=new Form1();
             static private JsonSerializerSettings setting = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+            static public ThreadStart networkErrorHandleThreadDelegate = new ThreadStart(network.networkErrorHandle);       //故障处理函数
+            static public Thread netErrorHandleThread = new Thread(networkErrorHandleThreadDelegate);                       //网络故障处理线程
 
             static public bool networkInitialize(object f)  //初始化网络
             {
-                //form1tmp = (Form1)f;
                 svr_port = GlobalVarForApp.server_port;     //获取配置信息
                 svr_ip = GlobalVarForApp.server_ip;
                 bool state = true;
@@ -44,10 +43,12 @@ namespace zk
                     state = false;
                     appLog.exceptionRecord("网络初始化异常"+e.Message);
                 }
-                if(state ==true )                           //网络正常，监听线程开启
+                if(state ==true )                         //网络正常，监听线程开启
                 {
-                    receiveDataThread.Start();      //开启接收线程
-                    sendDataThread.Start();          //开启发送接收线程
+                    GlobalVarForApp.networkStatusBool = true;
+                    receiveDataThread.Start();            //开启接收线程
+                    sendDataThread.Start();               //开启发送接收线程
+                    netErrorHandleThread.Start();
 #if _debug_
                     Console.WriteLine("--------------接收线程开启");
                     Console.WriteLine("--------------发送线程开启");
@@ -56,33 +57,112 @@ namespace zk
                 return state;
             }
 
-            private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+            //
+            //
+            public static void networkErrorHandle()
             {
-                Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",
-                                  e.SignalTime);
+                bool state = true;
+                //第一次启动进入等待，等待网络故障被唤醒
+                try
+                {
+                    Thread.Sleep(Timeout.Infinite);
+                }
+                catch (ThreadInterruptedException)
+                {
+                }
+                //被唤醒之后
+                while (true)
+                {
+                    //网络恢复后，进入无限等待，等唤醒
+                    if (GlobalVarForApp.networkStatusBool == true)
+                    {
+                        Console.WriteLine("网络恢复");
+                        try
+                        {
+                            receiveDataThread.Interrupt();
+                            //sendDataThread.Interrupt();
+                            Thread.Sleep(Timeout.Infinite);
+                        }
+                        catch (ThreadInterruptedException)
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        state = true;
+#if _debug_
+                            Console.WriteLine("Connect to server");
+#endif
+                            //listenSocket.Shutdown(SocketShutdown.Both);
+                            listenSocket.Close();
+                            listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                            svr_port = GlobalVarForApp.server_port;     //获取配置信息
+                            svr_ip = GlobalVarForApp.server_ip;
+                            try
+                            {
+                                listenSocket.Connect(new IPEndPoint(IPAddress.Parse(svr_ip), svr_port));  //连接服务器
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e.Message);
+                                state = false; //appLog.exceptionRecord("网络初始化异常");
+                                continue;
+                            }
+                            finally
+                            {
+                                GlobalVarForApp.networkStatusBool = state;
+                            }
+                        Console.WriteLine("唤醒receiveDataThread");
+                    }
+                }
             }
 
-            public static void receiveDataProc()            //在listenSocket 上监听
+
+
+            //  接收线程
+            //在listenSocket 上监听
+            public static void receiveDataProc()
             {
                 int messageCount=0;
                 byte[] messageBuf = new byte[10000];
                 string message = "";
                 int a = -1;
-                while (GlobalVarForApp.networkStatusBool)
+                while(true)
                 {
-                    messageCount = 0;
-                    a = -1;
-                    try{
-                            messageCount = listenSocket.Receive(messageBuf);        //将接收数据放入缓冲区
+                  if(GlobalVarForApp.networkStatusBool==false)  //网络故障
+                  {
+                    try
+                    {
+                        Thread.Sleep(Timeout.Infinite);         //线程阻塞
                     }
-                    catch (Exception exc){
-                        GlobalVarForApp.networkStatusBool = false;
+                    catch (ThreadInterruptedException)
+                    {
+                        message = "";
+                    }
+                  }
 #if _debug_
-                        Console.WriteLine("listenSocket.Receive函数异常,可能是网络中断");
+                  Console.WriteLine("接收线程开启");
 #endif
-                        appLog.exceptionRecord("网络中断" + exc.Message);
-                    }
+                  messageCount = 0;
+                  a = -1;
+                  try{
+                    messageCount = listenSocket.Receive(messageBuf);        //将接收数据放入缓冲区
+                  }
+                  catch (SocketException exc)
+                  {
+                    GlobalVarForApp.networkStatusBool = false;
+#if _debug_
+                    Console.WriteLine("listenSocket.Receive函数异常,可能是网络中断");
+#endif
+                    netErrorHandleThread.Interrupt();
+                    appLog.exceptionRecord("网络中断" + exc.Message);
+                    continue;
+                  }
                     message = message.Trim()+u8.GetString(messageBuf,0,messageCount).Trim();
+#if _debug_
+                    Console.Write(message);
+#endif
                     a = message.IndexOf("DataEnd");                                         //数据是否有DataEnd
                     if (a != -1)                       //数据中存在DataEnd
                     {
@@ -90,17 +170,15 @@ namespace zk
                         {
                             GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));       //获取有效数据
                             message = message.Substring(a + 7);
-                            //form1tmp.messageHandle();
-                            //netandorder.HandleTheMessageReceive();  //处理
                         }
                         catch (Exception e)
                         {
                             MessageBox.Show(e.Message);
                         }
+                       //GlobalVarForApp.messageHandle_thread.Interrupt();
                     }
-                    GlobalVarForApp.messageHandle_thread.Interrupt();
+
                 }
-                return;
             }
 
             public static void sendData(RSData dataToSend)
