@@ -29,7 +29,7 @@ namespace zk
             static public ThreadStart networkErrorHandleThreadDelegate = new ThreadStart(network.networkErrorHandle);       //故障处理函数
             static public Thread netErrorHandleThread = new Thread(networkErrorHandleThreadDelegate);                       //网络故障处理线程
 
-            static public bool networkInitialize(object f)  //初始化网络
+            static public bool networkInitialize()  //初始化网络
             {
                 svr_port = GlobalVarForApp.server_port;     //获取配置信息
                 svr_ip = GlobalVarForApp.server_ip;
@@ -175,7 +175,7 @@ namespace zk
                         {
                             MessageBox.Show(e.Message);
                         }
-                       //GlobalVarForApp.messageHandle_thread.Interrupt();
+                       GlobalVarForApp.messageHandle_thread.Interrupt();
                     }
 
                 }

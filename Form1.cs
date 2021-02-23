@@ -99,38 +99,8 @@ namespace zk
                     tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
                     tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[0].Value = (ordersCount+1).ToString();        //第一列 序号 按调度令增序排列
-                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderInfo.ORDER_YEAR+" "+ tmpOrInfo.orderInfo.ORDER_CODE;//第二列调度令号
-/*
-                    tmp = "";
-                    switch (tmpOrInfo.orderInstructionList[0].TR_ID)
-                    {
-                            case 1:
-                                tmp = "A01";
-                                break;
-                            case 2:
-                                tmp = "A02";
-                                break;
-                            case 3:
-                                tmp = "A03";
-                                break;
-                            case 4:
-                                tmp = "A04";
-                                break;
-                            case 5:
-                                tmp = "A05";
-                                break;
-                            case 6:
-                                tmp = "A06";
-                                break;
-                            case 7:
-                                tmp = "B01";
-                                break;
-                    }
-                    if (tmpOrInfo.orderInstructionList.Count() > 1)
-                    {
-                        tmp += "+";     
-                    }
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = tmp;     */
+                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderCode;//第二列调度令号
+                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = tmpOrInfo.ooc[0].transCode.Trim();     
 /*
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.Font = new Font("宋体", 12, FontStyle.Bold);       //调度令状态
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Red;
@@ -227,83 +197,83 @@ namespace zk
 
         }
 
-        public void messageHandle()
-        {
-            RSData tmp = new RSData();
-            OrderInfo tmpOI = new OrderInfo();      //调度令信息
-            while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
-            {
-                //foreach( RSData  rsdData in receiveQueue)
-                //{   //
-                //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
-                //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
-                tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();
+        //public void messageHandle()
+        //{
+        //    RSData tmp = new RSData();
+        //    OrderInfo tmpOI = new OrderInfo();      //调度令信息
+        //    while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
+        //    {
+        //        foreach( RSData  rsdData in receiveQueue)
+        //        {   //
+        //        "LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
+        //        "DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
+        //        tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();
 
-                switch (tmp.CommType.Trim())
-                {
-                    case "LOGIN_REPLY":
-                        break;
+        //        switch (tmp.CommType.Trim())
+        //        {
+        //            case "LOGIN_REPLY":
+        //                break;
 
-                    case "ADD_USER_REPLY":
-                        break;
+        //            case "ADD_USER_REPLY":
+        //                break;
 
-                    case "DELETE_USER_REPLY":
-                        break;
+        //            case "DELETE_USER_REPLY":
+        //                break;
 
-                    case "DOWN_ORDER_REPLY":
-                        MessageBox.Show("Down order reply");
-                        tmpOI.commTime=tmp.CommTime;
-                        tmpOI.orderInfo = tmp.order;
-                        tmpOI.infoReturn = tmp.infoReturn;
+        //            case "DOWN_ORDER_REPLY":
+        //                MessageBox.Show("Down order reply");
+        //                tmpOI.commTime=tmp.CommTime;
+        //                tmpOI.orderInfo = tmp.order;
+        //                tmpOI.infoReturn = tmp.infoReturn;
                         
-                        tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
-                        GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                        //对orInfo全局变量按调度令号进行排序
-                        if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)
-                        {
-                            GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
-                        }
-                        //od_dis.od_dis_show();            //新调度令显示                           
-                        //tbd_OrderInfo_display();
+        //                tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
+        //                GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
+        //                对orInfo全局变量按调度令号进行排序
+        //                if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)
+        //                {
+        //                    GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
+        //                }
+        //                od_dis.od_dis_show();            //新调度令显示                           
+        //                tbd_OrderInfo_display();
 
-                        //
-                        //接收到新调度语音提示
-                        //
-
-                        break;
-
-
-                    case "QUERY_ORDERS_REPLY":      //批量查询
-                             //调度令信息
                         
-                        break;
+        //                接收到新调度语音提示
+                        
+
+        //                break;
+
+
+        //            case "QUERY_ORDERS_REPLY":      //批量查询
+        //                     调度令信息
+                        
+        //                break;
                     
-                    case "QUERY_ORDER_REPLY":         //单个查询
-                        //调度令信息
+        //            case "QUERY_ORDER_REPLY":         //单个查询
+        //                调度令信息
 
-                        break;
+        //                break;
 
-                    case "NEW_MESSAGE":
-                        break;
+        //            case "NEW_MESSAGE":
+        //                break;
 
-                    case "RECEIVE_ORDER_REPLY":
-                        //提取调度令信息
-                        tmpOI.commTime=tmp.CommTime;
-                        tmpOI.orderInfo = tmp.order;
-                        tmpOI.infoReturn = tmp.infoReturn;
-                        tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
-                        GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                        //tbd_OrderInfo_display();
-                        break;
+        //            case "RECEIVE_ORDER_REPLY":
+        //                提取调度令信息
+        //                tmpOI.commTime=tmp.CommTime;
+        //                tmpOI.orderInfo = tmp.order;
+        //                tmpOI.infoReturn = tmp.infoReturn;
+        //                tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
+        //                GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
+        //                tbd_OrderInfo_display();
+        //                break;
 
-                    default: /* 可选的 */
-                        break;
+        //            default: /* 可选的 */
+        //                break;
 
-                }
-                // }
-            }
+        //        }
+        //         }
+        //    }
 
-        }
+        //}
 
         private void mouseClickOrder(object sender, DataGridViewCellMouseEventArgs e)
         {

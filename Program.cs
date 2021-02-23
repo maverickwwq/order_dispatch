@@ -26,6 +26,12 @@ namespace zk
         [STAThread]
         static void Main()
         {
+            if (program_initial() == false)
+            {
+                MessageBox.Show("系统初始化失败，无法启动");
+                return;
+            }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -40,13 +46,7 @@ namespace zk
 #if _debug_
             Console.WriteLine("--------------界面刷新线程开启");
 #endif
-            if (program_initial(f) == false)
-            {
-                MessageBox.Show("系统初始化失败，无法启动");
-                return;
-            }
 
-            //用户登录
 #if _debug_
             Console.WriteLine("初始化业务");
             Console.WriteLine("获取所有未处理的调度令");
@@ -111,7 +111,7 @@ namespace zk
              */
         }
 
-        private static bool program_initial(object f)       //系统初始化   成功返回true 失败false
+        private static bool program_initial()       //系统初始化   成功返回true 失败false
         {
             //  读配置文件
             var setting = ConfigurationManager.AppSettings;
@@ -134,7 +134,7 @@ namespace zk
             GlobalVarForApp.tbh_ordersInfoList.Clear();             //存放未处理完成的所有调度令的信息
 
             //网络连接正常？
-            if (network.networkInitialize(f) == true)                       //网络正常，正常则启动发送、接收线程
+            if (network.networkInitialize() == true)                       //网络正常，正常则启动发送、接收线程
             {
                 //do something
 #if _debug_
@@ -155,9 +155,6 @@ namespace zk
             //开启数据处理线程，处理网络接收的数据包
             GlobalVarForApp.messageHandle_thread = new Thread(netandorder.HandleTheMessageReceive);
             GlobalVarForApp.messageHandle_thread.Start();
- #if _debug_
-                Console.WriteLine("--------------数据处理线程开启");
-#endif
         return true;
         }
 

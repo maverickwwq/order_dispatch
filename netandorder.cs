@@ -79,6 +79,7 @@ namespace zk
         //-----------------------------------------------------------------------------------------------------------------------------------
         //
         //
+        /*
         public static OrderInfo down_order_receive(RSData tmp, OrderInfo oitmp)         //接收DOWN_ORDER，将数据存入全局变量
         {
             oitmp.orderInfo = tmp.order;
@@ -123,14 +124,22 @@ namespace zk
             oitmp.orderInstructionList = tmp.orderOpList;
             return oitmp;
         }
+        */
 
         //对接收到的数据进行处理
         public static void HandleTheMessageReceive()
         {
+#if _debug_
+            Console.WriteLine("--------------数据处理线程开启");
+#endif
             RSData rcv_rsd = new RSData();
-            OrderInfo tmpOI = new OrderInfo();      //调度令信息
+            OrderInfo tmpOI;
+            //OrderInfo tmpOI = new OrderInfo();      //调度令信息
             while (true)
             {
+#if _debug_
+                Console.WriteLine("触发了一次数据处理线程处理");
+#endif
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
                 {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
                                 //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
@@ -146,7 +155,17 @@ namespace zk
 
                         case "DELETE_USER_REPLY":
                             break;
+                        case "DOWN_ORDER":              //把GlobalVarForApp.receiveMessageQueue里的RSD数据整理成tbh_ordersInfoList的List<OrderInfo>数据
+                            tmpOI = new OrderInfo(rcv_rsd.order);
+                            for(int j=0;j<tmpOI.oos.GetLength(0);j++){
+                                if (tmpOI.oos[j] == null)
+                                    break;
+                                tmpOI.oos[j].orderStatus = OrderStatus.unconfirmed;
+                                tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            }
+                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);
 
+                            break;
                         case "DOWN_ORDER_REPLY":
                             //MessageBox.Show("Down order reply");
                             //接收到服务器发送的接收调度令确认数据
@@ -154,10 +173,11 @@ namespace zk
                             //         这次接收的数据为准
                             //2、    客户端不存在该调度令的数据，将数据存入全局变量tbh_ordersInfoList
                             //3、  对tbh_ordersInfoList进行排序
-                            tmpOI.commTime = rcv_rsd.CommTime;
-                            tmpOI.orderInfo = rcv_rsd.order;
-                            tmpOI.infoReturn = rcv_rsd.infoReturn;
-                            tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
+                            tmpOI = new OrderInfo(rcv_rsd.order);
+                            for(int j=0;j<tmpOI.oos.GetLength(0);j++){
+                                tmpOI.oos[j].orderStatus = OrderStatus.unconfirmed;
+                                tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            }
                             /* //已经存在该调度令，用最新的数据覆盖该调度令
                            if()
                            {
@@ -182,7 +202,7 @@ namespace zk
                         case "QUERY_ORDERS_REPLY":      //批量查询
                             //调度令信息
                             List<OrderAndOp> tmpOaoList = new List<OrderAndOp>();
-                            tmpOaoList = query_orders_reply_receive(rcv_rsd);
+                            //tmpOaoList = query_orders_reply_receive(rcv_rsd);
                             if (rcv_rsd.query.pageSize == 100)      //系统初始化时查询所有未完成调度令
                             {
                                 //清空全局变量     tbh_orderInfo
@@ -214,11 +234,11 @@ namespace zk
 
                         case "RECEIVE_ORDER_REPLY":
                             //提取调度令信息
-                            tmpOI.commTime = rcv_rsd.CommTime;
-                            tmpOI.orderInfo = rcv_rsd.order;
-                            tmpOI.infoReturn = rcv_rsd.infoReturn;
-                            tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
-                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
+                            //tmpOI.commTime = rcv_rsd.CommTime;
+                            //tmpOI.orderInfo = rcv_rsd.order;
+                            //tmpOI.infoReturn = rcv_rsd.infoReturn;
+                            //tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
+                            //GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
                             //tbd_OrderInfo_display();
                             break;
 
