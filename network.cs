@@ -177,7 +177,6 @@ namespace zk
                         }
                        GlobalVarForApp.messageHandle_thread.Interrupt();
                     }
-
                 }
             }
 
@@ -229,32 +228,5 @@ namespace zk
                 }
                 return;
             }
-
-
-            //        public bool sendData(Socket
-/*
-            public static void thread(Object f)
-            {
-                networkInitialize(f);
-                try
-                {//程序在这里循环 监听 网络消息
-                    while (true)
-                    {
-                        //接收服务器发送的消息
-                        //判断服务器发送的消息类型
-                        //对不同类型的消息进行分类处理
-                        MessageBox.Show("listen");
-                        network.receiveDataProc();
-                    }
-                }
-                catch (Exception e)
-                {
-                    //MessageBox.Show("Network error!");
-                }
-                finally
-                {
-                    //System.Environment.Exit(0);
-                }
-            }*/
         }
 }

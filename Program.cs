@@ -10,7 +10,6 @@ using System.Configuration;
 using DispatchServer.BaseClass;
 
 
-
 //这个项目是中控机房的客户端
 
 namespace zk
@@ -130,11 +129,11 @@ namespace zk
             //初始化全局变量
             GlobalVarForApp.GlobalVarForAppInitial();
             GlobalVarForApp.receiveMessageQueue.Clear();    //消息接收队列
-            GlobalVarForApp.sendMessageQueue.Clear();        //消息发送队列
-            GlobalVarForApp.tbh_ordersInfoList.Clear();             //存放未处理完成的所有调度令的信息
+            GlobalVarForApp.sendMessageQueue.Clear();       //消息发送队列
+            GlobalVarForApp.tbh_ordersInfoList.Clear();     //存放未处理完成的所有调度令的信息
 
             //网络连接正常？
-            if (network.networkInitialize() == true)                       //网络正常，正常则启动发送、接收线程
+            if (network.networkInitialize() == true)        //网络正常，正常则启动发送、接收线程
             {
                 //do something
 #if _debug_

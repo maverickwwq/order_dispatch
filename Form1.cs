@@ -26,26 +26,27 @@ namespace zk
         {
             orderHistory_btn.Text = "历史调度令查询";
             //界面标题数组 标题宽度
-            String[] title_UI = {"序号","单号","日常","机房","状态","时间"};
-            int[] title_UI_width = {30,100,30,30,100,100 };
+            String[] title_UI = {"序号","单号","日常","机号","状态","时间"};
+            int[] title_UI_width = {20,150,30,60,100,100 };
             this.FormClosing += new FormClosingEventHandler(programExit);
-            tbd_OrderInfo_dgv.RowHeadersVisible = false;//不要每行的第一个序号单元       
-            tbd_OrderInfo_dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect ;//全行选择
+            tbd_OrderInfo_dgv.RowHeadersVisible = false;                                //不要每行的第一个序号单元
+            tbd_OrderInfo_dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect ; //全行选择
             tbd_OrderInfo_dgv.BorderStyle = BorderStyle.Fixed3D;
-            tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.None;   //单元格无边框
+            tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.None;       //单元格无边框
             tbd_OrderInfo_dgv.AutoSizeColumnsMode =  DataGridViewAutoSizeColumnsMode.Fill;//延伸整个窗口
-            tbd_OrderInfo_dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            tbd_OrderInfo_dgv.AllowUserToAddRows = false;       //去掉最后一行空白行
+            tbd_OrderInfo_dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;//不可以调整列大小
+            tbd_OrderInfo_dgv.AllowUserToAddRows = false;      //去掉最后一行空白行
             tbd_OrderInfo_dgv.AllowUserToResizeColumns = false;//固定列宽
-            tbd_OrderInfo_dgv.AllowUserToResizeRows = false;        //固定行高
-            tbd_OrderInfo_dgv.AllowUserToOrderColumns = false;      //列顺序不可变更
+            tbd_OrderInfo_dgv.AllowUserToResizeRows = false;   //固定行高
+            tbd_OrderInfo_dgv.AllowUserToOrderColumns = false; //列顺序不可变更
             tbd_OrderInfo_dgv.MultiSelect = false;                                  //不可多行选择
             tbd_OrderInfo_dgv.ReadOnly = true;                                      //单元格不可编辑
             tbd_OrderInfo_dgv.DefaultCellStyle.Font = new Font("宋体",12);
             tbd_OrderInfo_dgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;//居中
-            tbd_OrderInfo_dgv.DefaultCellStyle.SelectionBackColor = Color.LightSeaGreen;//选中行背景色
-            tbd_OrderInfo_dgv.DefaultCellStyle.BackColor = Color.LightYellow;                             //单元格默认背景色
-            tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;   //水平分割线
+            tbd_OrderInfo_dgv.DefaultCellStyle.SelectionBackColor = Color.LightSeaGreen;   //选中行背景色
+            tbd_OrderInfo_dgv.DefaultCellStyle.BackColor = Color.LightYellow;              //单元格默认背景色
+            //tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;   //水平分割线样式
+            tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.SunkenVertical;   //水平分割线样式
             tbd_OrderInfo_dgv.BackgroundColor = Color.White;                //datagridview背景色
             tbd_OrderInfo_dgv.ColumnCount = title_UI.Length;    //共6列
 
@@ -70,7 +71,7 @@ namespace zk
 
         public delegate void UI_refresh_delegate();
         public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
-        {                                                                                                         //同时不会产生错误
+        {                                                                    //同时不会产生错误
 #if _debug_
            // Console.WriteLine("界面刷新");
 #endif
@@ -91,7 +92,7 @@ namespace zk
             if (GlobalVarForApp.tbh_ordersInfoList.Count == 0)         //无待处理调度令返回
                 return;
             else   //有待处理调度令
-            {            
+            {
                 tbd_OrderInfo_dgv.Rows.Clear();     //先清空
                 int ordersCount = 0;                          //
                 foreach (OrderInfo tmpOrInfo in GlobalVarForApp.tbh_ordersInfoList)
@@ -100,7 +101,40 @@ namespace zk
                     tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[0].Value = (ordersCount+1).ToString();        //第一列 序号 按调度令增序排列
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderCode;//第二列调度令号
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = tmpOrInfo.ooc[0].transCode.Trim();     
+                    bool gudingrenwuBool=false;
+                    /*foreach(Order_Op_Content ooc in tmpOrInfo.ooc)
+                    {
+                      ooc=new Order_Op_Content();
+                      Console.WriteLine("---_______----------------------_____------");
+                      Console.WriteLine(ooc.startDate);
+                      Console.WriteLine(ooc.endDate);
+                      if(ooc.startDate.Equals(ooc.endDate))   //true临时调度   false固定
+                      {
+
+                      }
+                      else
+                      {
+                        gudingrenwuBool=true;
+                        break;
+                      }
+                    }*/
+                    string tmp="";
+                    for (int i=0; i< tmpOrInfo.orderOpNum; i++)
+                    {
+                      tmp=tmp+tmpOrInfo.ooc[i].transCode+" ";
+                      if(tmpOrInfo.ooc[i].startDate.Equals(tmpOrInfo.ooc[i].endDate))
+                        continue;
+                      else
+                      {
+                        gudingrenwuBool=true;
+                      }
+                    }
+                    if(gudingrenwuBool==true)
+                      tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value="固";
+                    else
+                      tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value="临";
+                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value=tmp;
+                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = tmpOrInfo.ooc[0].transCode.Trim();
 /*
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.Font = new Font("宋体", 12, FontStyle.Bold);       //调度令状态
                     tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Red;
@@ -121,8 +155,8 @@ namespace zk
                             tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Green;
                             tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Green;
                             tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "已反馈";
-             
-                        
+
+
                                       if(){//开启则显示时间                                      //         未完成！！！！！！！！！！！！！！！！！！！！！
                                 tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
                             }
@@ -225,7 +259,7 @@ namespace zk
         //                tmpOI.commTime=tmp.CommTime;
         //                tmpOI.orderInfo = tmp.order;
         //                tmpOI.infoReturn = tmp.infoReturn;
-                        
+
         //                tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
         //                GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
         //                对orInfo全局变量按调度令号进行排序
@@ -233,21 +267,21 @@ namespace zk
         //                {
         //                    GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
         //                }
-        //                od_dis.od_dis_show();            //新调度令显示                           
+        //                od_dis.od_dis_show();            //新调度令显示
         //                tbd_OrderInfo_display();
 
-                        
+
         //                接收到新调度语音提示
-                        
+
 
         //                break;
 
 
         //            case "QUERY_ORDERS_REPLY":      //批量查询
         //                     调度令信息
-                        
+
         //                break;
-                    
+
         //            case "QUERY_ORDER_REPLY":         //单个查询
         //                调度令信息
 

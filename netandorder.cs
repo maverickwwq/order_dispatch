@@ -155,17 +155,16 @@ namespace zk
 
                         case "DELETE_USER_REPLY":
                             break;
-                        case "DOWN_ORDER":              //把GlobalVarForApp.receiveMessageQueue里的RSD数据整理成tbh_ordersInfoList的List<OrderInfo>数据
-                            tmpOI = new OrderInfo(rcv_rsd.order);
-                            for(int j=0;j<tmpOI.oos.GetLength(0);j++){
-                                if (tmpOI.oos[j] == null)
-                                    break;
+                            
+                        case "DOWN_ORDER":              //把GlobalVarForApp.receiveMessageQueue里的RSD数据整理成tbh_ordersInfoList里的List<OrderInfo>数据
+                            tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
+                            for(int j=0;j<tmpOI.orderOpNum;j++){
                                 tmpOI.oos[j].orderStatus = OrderStatus.unconfirmed;
                                 tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                             }
-                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);
-
+                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
                             break;
+
                         case "DOWN_ORDER_REPLY":
                             //MessageBox.Show("Down order reply");
                             //接收到服务器发送的接收调度令确认数据
