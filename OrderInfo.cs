@@ -36,6 +36,7 @@ namespace zk
               this.ooc[i].orderNum=oop.num;                   //序号
               this.oos[i].orderCode=oop.orderCode;            //文号
               this.oos[i].orderNum=oop.num;                   //序号
+              this.ooc[i].power = oop.power;
               this.ooc[i].transCode=oop.transCode;            //发射机号
               this.ooc[i].startTime=oop.startTime;      //开始时间
               this.ooc[i].endTime=oop.endTime;          //结束时间
@@ -69,6 +70,7 @@ namespace zk
         public string orderCode;   //调单号
         public int orderNum;    //调单序号
         public string transCode;   //发射机代码
+        public int power;           //功率
         public string startTime;   //开始时间
         public string endTime;     //结束时间
         public int freq;        //频率

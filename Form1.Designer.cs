@@ -35,8 +35,8 @@
             // 
             // tbd_OrderInfo_dgv
             // 
-            this.tbd_OrderInfo_dgv.Location = new System.Drawing.Point(0, 46);
-            this.tbd_OrderInfo_dgv.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tbd_OrderInfo_dgv.Location = new System.Drawing.Point(13, 33);
+            this.tbd_OrderInfo_dgv.Margin = new System.Windows.Forms.Padding(4);
             this.tbd_OrderInfo_dgv.Name = "tbd_OrderInfo_dgv";
             this.tbd_OrderInfo_dgv.RowTemplate.Height = 23;
             this.tbd_OrderInfo_dgv.Size = new System.Drawing.Size(1024, 679);
@@ -50,7 +50,7 @@
             // orderHistory_btn
             // 
             this.orderHistory_btn.Location = new System.Drawing.Point(1057, 46);
-            this.orderHistory_btn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.orderHistory_btn.Margin = new System.Windows.Forms.Padding(4);
             this.orderHistory_btn.Name = "orderHistory_btn";
             this.orderHistory_btn.Size = new System.Drawing.Size(168, 29);
             this.orderHistory_btn.TabIndex = 1;
@@ -65,7 +65,7 @@
             this.ClientSize = new System.Drawing.Size(1252, 725);
             this.Controls.Add(this.orderHistory_btn);
             this.Controls.Add(this.tbd_OrderInfo_dgv);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);

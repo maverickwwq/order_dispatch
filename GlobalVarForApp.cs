@@ -24,6 +24,7 @@ namespace zk
         public static List<OrderInfo> tbh_ordersInfoList = new List<OrderInfo>();                       //存放未处理完成的所有调度令的信息
 
         public static Thread messageHandle_thread;
+        public static Form1 f;
 
         public static void GlobalVarForAppInitial()
         {

@@ -25,31 +25,29 @@ namespace zk
         [STAThread]
         static void Main()
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             if (program_initial() == false)
             {
                 MessageBox.Show("系统初始化失败，无法启动");
                 return;
             }
-
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            Form1 f=new Form1();
-            System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(2000);
+            //System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer.
             //界面刷新定时器
-            UI_refresh_timer.Elapsed += f.UIrefresh;
-            UI_refresh_timer.AutoReset = true;
-            UI_refresh_timer.Enabled = true;
-
+            //UI_refresh_timer.Elapsed += f.UIrefresh;
+            //UI_refresh_timer.AutoReset = true;
+            //UI_refresh_timer.Enabled = true;
 #if _debug_
             Console.WriteLine("--------------界面刷新线程开启");
 #endif
 
 #if _debug_
-            Console.WriteLine("初始化业务");
-            Console.WriteLine("获取所有未处理的调度令");
+
 #endif
+
+            Form1 f = new Form1();
+            GlobalVarForApp.f = f;
             Application.Run(f);
 
             /*
@@ -154,6 +152,9 @@ namespace zk
             //开启数据处理线程，处理网络接收的数据包
             GlobalVarForApp.messageHandle_thread = new Thread(netandorder.HandleTheMessageReceive);
             GlobalVarForApp.messageHandle_thread.Start();
+#if _debug_
+            Console.WriteLine("------------------声音报警线程开启");
+#endif
         return true;
         }
 

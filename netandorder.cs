@@ -7,6 +7,7 @@ using DispatchServer;
 using DispatchServer.BaseClass;
 using System.Windows.Forms;
 using System.Threading;
+using System.Timers;
 namespace zk
 {
     public class netandorder
@@ -163,6 +164,7 @@ namespace zk
                                 tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                             }
                             GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
+                            GlobalVarForApp.f.UIrefresh(null,null);
                             break;
 
                         case "DOWN_ORDER_REPLY":

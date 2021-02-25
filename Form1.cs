@@ -27,7 +27,7 @@ namespace zk
             orderHistory_btn.Text = "历史调度令查询";
             //界面标题数组 标题宽度
             String[] title_UI = {"序号","单号","日常","机号","状态","时间"};
-            int[] title_UI_width = {20,150,30,60,100,100 };
+            int[] title_UI_width = {30,150,30,60,100,100 };
             this.FormClosing += new FormClosingEventHandler(programExit);
             tbd_OrderInfo_dgv.RowHeadersVisible = false;                                //不要每行的第一个序号单元
             tbd_OrderInfo_dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect ; //全行选择
@@ -41,13 +41,13 @@ namespace zk
             tbd_OrderInfo_dgv.AllowUserToOrderColumns = false; //列顺序不可变更
             tbd_OrderInfo_dgv.MultiSelect = false;                                  //不可多行选择
             tbd_OrderInfo_dgv.ReadOnly = true;                                      //单元格不可编辑
-            tbd_OrderInfo_dgv.DefaultCellStyle.Font = new Font("宋体",12);
+            //tbd_OrderInfo_dgv.DefaultCellStyle.Font = new Font("宋体",12);
             tbd_OrderInfo_dgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;//居中
-            tbd_OrderInfo_dgv.DefaultCellStyle.SelectionBackColor = Color.LightSeaGreen;   //选中行背景色
-            tbd_OrderInfo_dgv.DefaultCellStyle.BackColor = Color.LightYellow;              //单元格默认背景色
+            //tbd_OrderInfo_dgv.DefaultCellStyle.SelectionBackColor = Color.LightSeaGreen;   //选中行背景色
+            //tbd_OrderInfo_dgv.DefaultCellStyle.BackColor = Color.LightYellow;              //单元格默认背景色
             //tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;   //水平分割线样式
             tbd_OrderInfo_dgv.CellBorderStyle = DataGridViewCellBorderStyle.SunkenVertical;   //水平分割线样式
-            tbd_OrderInfo_dgv.BackgroundColor = Color.White;                //datagridview背景色
+            //tbd_OrderInfo_dgv.BackgroundColor = Color.White;                //datagridview背景色
             tbd_OrderInfo_dgv.ColumnCount = title_UI.Length;    //共6列
 
             //tbd_OrderInfo_dgv.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
@@ -186,37 +186,37 @@ namespace zk
         //
         private void mouseEnterOrderInfoDGV(object sender, DataGridViewCellEventArgs e)
         {
-           // tbd_OrderInfo_dgv.Rows[1].Cells[0].Value = "in";
-            tbd_OrderInfo_dgv.ClearSelection();
-            for (int rowCount = 0; rowCount < tbd_OrderInfo_dgv.RowCount; rowCount++)
-                tbd_OrderInfo_dgv.Rows[rowCount].DefaultCellStyle.BackColor = Color.LightYellow;
-            if (e.RowIndex >= 0)//鼠标进入数据栏
-            {
-                tbd_OrderInfo_dgv.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
-                this.Cursor = System.Windows.Forms.Cursors.Hand;
-            }
-            else
-            {
-                this.Cursor = System.Windows.Forms.Cursors.Default;
-                //鼠标进入标题栏
-            }
-            //tbd_OrderInfo_dgv.Rows[0].Cells[0].Value = e.RowIndex.ToString();
+           //// tbd_OrderInfo_dgv.Rows[1].Cells[0].Value = "in";
+           // tbd_OrderInfo_dgv.ClearSelection();
+           // for (int rowCount = 0; rowCount < tbd_OrderInfo_dgv.RowCount; rowCount++)
+           //     tbd_OrderInfo_dgv.Rows[rowCount].DefaultCellStyle.BackColor = Color.LightYellow;
+           // if (e.RowIndex >= 0)//鼠标进入数据栏
+           // {
+           //     tbd_OrderInfo_dgv.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+           //     this.Cursor = System.Windows.Forms.Cursors.Hand;
+           // }
+           // else
+           // {
+           //     this.Cursor = System.Windows.Forms.Cursors.Default;
+           //     //鼠标进入标题栏
+           // }
+           // //tbd_OrderInfo_dgv.Rows[0].Cells[0].Value = e.RowIndex.ToString();
         }
 
         private void mouseLeaveOrderInfoDGV(object sender, EventArgs e)
         {
 
-            tbd_OrderInfo_dgv.ClearSelection();
-            for (int rowCount = 0; rowCount < tbd_OrderInfo_dgv.RowCount; rowCount++)
-                tbd_OrderInfo_dgv.Rows[rowCount].DefaultCellStyle.BackColor = Color.LightYellow;
-           // tbd_OrderInfo_dgv.Rows[1].Cells[0].Value = "out";
-            this.Cursor = System.Windows.Forms.Cursors.Default;
+           // tbd_OrderInfo_dgv.ClearSelection();
+           // for (int rowCount = 0; rowCount < tbd_OrderInfo_dgv.RowCount; rowCount++)
+           //     tbd_OrderInfo_dgv.Rows[rowCount].DefaultCellStyle.BackColor = Color.LightYellow;
+           //// tbd_OrderInfo_dgv.Rows[1].Cells[0].Value = "out";
+           // this.Cursor = System.Windows.Forms.Cursors.Default;
         }
 
         private void mouseLeaveOrderInfoDGV(object sender, DataGridViewCellEventArgs e)
         {
-            tbd_OrderInfo_dgv.ClearSelection();
-            this.Cursor = System.Windows.Forms.Cursors.Default;
+            //tbd_OrderInfo_dgv.ClearSelection();
+            //this.Cursor = System.Windows.Forms.Cursors.Default;
         }
 
         //排序函数   对消息队列的调度令进行排序，按调令文号增序排列
@@ -228,92 +228,15 @@ namespace zk
                 return -1;
             else */
                 return 0;
-
         }
-
-        //public void messageHandle()
-        //{
-        //    RSData tmp = new RSData();
-        //    OrderInfo tmpOI = new OrderInfo();      //调度令信息
-        //    while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
-        //    {
-        //        foreach( RSData  rsdData in receiveQueue)
-        //        {   //
-        //        "LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
-        //        "DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
-        //        tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();
-
-        //        switch (tmp.CommType.Trim())
-        //        {
-        //            case "LOGIN_REPLY":
-        //                break;
-
-        //            case "ADD_USER_REPLY":
-        //                break;
-
-        //            case "DELETE_USER_REPLY":
-        //                break;
-
-        //            case "DOWN_ORDER_REPLY":
-        //                MessageBox.Show("Down order reply");
-        //                tmpOI.commTime=tmp.CommTime;
-        //                tmpOI.orderInfo = tmp.order;
-        //                tmpOI.infoReturn = tmp.infoReturn;
-
-        //                tmpOI.orderStatus = OrderStatus.unconfirmed;        //设置调度令状态信息    未接收确认状态
-        //                GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-        //                对orInfo全局变量按调度令号进行排序
-        //                if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)
-        //                {
-        //                    GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
-        //                }
-        //                od_dis.od_dis_show();            //新调度令显示
-        //                tbd_OrderInfo_display();
-
-
-        //                接收到新调度语音提示
-
-
-        //                break;
-
-
-        //            case "QUERY_ORDERS_REPLY":      //批量查询
-        //                     调度令信息
-
-        //                break;
-
-        //            case "QUERY_ORDER_REPLY":         //单个查询
-        //                调度令信息
-
-        //                break;
-
-        //            case "NEW_MESSAGE":
-        //                break;
-
-        //            case "RECEIVE_ORDER_REPLY":
-        //                提取调度令信息
-        //                tmpOI.commTime=tmp.CommTime;
-        //                tmpOI.orderInfo = tmp.order;
-        //                tmpOI.infoReturn = tmp.infoReturn;
-        //                tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
-        //                GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-        //                tbd_OrderInfo_display();
-        //                break;
-
-        //            default: /* 可选的 */
-        //                break;
-
-        //        }
-        //         }
-        //    }
-
-        //}
 
         private void mouseClickOrder(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.RowIndex != -1)
             {
-                MessageBox.Show("cell click"+e.RowIndex);
+                //MessageBox.Show("cell click"+e.RowIndex);
+                Form orderInfoForm1 = new orderInfoForm(e.RowIndex);
+                orderInfoForm1.Show();
             }
         }
 

@@ -24,7 +24,7 @@ namespace zk
             static private Thread receiveDataThread = new Thread(listenOnPortThreadDelegate);                   //接收数据线程
             static private ThreadStart sendDataThreadDelegate = new ThreadStart(network.sendRSDataProc);        //发送数据函数
             static private Thread sendDataThread = new Thread(sendDataThreadDelegate);                          //发送数据线程
-            //static private Form1 form1tmp=new Form1();
+            static private Form1 form1tmp=new Form1();
             static private JsonSerializerSettings setting = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
             static public ThreadStart networkErrorHandleThreadDelegate = new ThreadStart(network.networkErrorHandle);       //故障处理函数
             static public Thread netErrorHandleThread = new Thread(networkErrorHandleThreadDelegate);                       //网络故障处理线程
@@ -52,73 +52,70 @@ namespace zk
 #if _debug_
                     Console.WriteLine("--------------接收线程开启");
                     Console.WriteLine("--------------发送线程开启");
+                    Console.WriteLine("--------------网络故障重连线程开启");
 #endif
                 }
                 return state;
             }
 
-            //
-            //
             public static void networkErrorHandle()
             {
-                bool state = true;
-                //第一次启动进入等待，等待网络故障被唤醒
-                try
+                try //第一次启动进入等待，等待网络故障被唤醒
                 {
                     Thread.Sleep(Timeout.Infinite);
                 }
-                catch (ThreadInterruptedException)
-                {
-                }
+                catch (ThreadInterruptedException) { }
                 //被唤醒之后
+                bool state=GlobalVarForApp.networkStatusBool;
                 while (true)
                 {
-                    //网络恢复后，进入无限等待，等唤醒
-                    if (GlobalVarForApp.networkStatusBool == true)
+                    if (state == true)//网络恢复后，进入无限等待，等唤醒
                     {
+#if _debug_
                         Console.WriteLine("网络恢复");
+#endif
                         try
                         {
-                            receiveDataThread.Interrupt();
+                            receiveDataThread.Interrupt();      //重连成功，开启接收线程
                             //sendDataThread.Interrupt();
+                            GlobalVarForApp.networkStatusBool=state;
                             Thread.Sleep(Timeout.Infinite);
                         }
                         catch (ThreadInterruptedException)
                         {
-                            continue;
+                            state=false;
+                            continue; //网络故障，被唤醒，开始重连
                         }
                     }
-                    else
+                    else    //网络故障，被唤醒，开始重连
                     {
-                        state = true;
 #if _debug_
                             Console.WriteLine("Connect to server");
 #endif
-                            //listenSocket.Shutdown(SocketShutdown.Both);
-                            listenSocket.Close();
+                            try{
+                              listenSocket.Shutdown(SocketShutdown.Both);
+                            }
+                            finally{
+                              listenSocket.Close();
+                            }
                             listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                             svr_port = GlobalVarForApp.server_port;     //获取配置信息
                             svr_ip = GlobalVarForApp.server_ip;
-                            try
+                            while(state==false)
                             {
-                                listenSocket.Connect(new IPEndPoint(IPAddress.Parse(svr_ip), svr_port));  //连接服务器
+                              try{
+                                  state=true;
+                                  listenSocket.Connect(new IPEndPoint(IPAddress.Parse(svr_ip), svr_port));  //连接服务器
+                              }
+                              catch (Exception e){
+                                  Console.WriteLine(e.Message);
+                                  state = false; //appLog.exceptionRecord("网络初始化异常");
+                              }
                             }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                                state = false; //appLog.exceptionRecord("网络初始化异常");
-                                continue;
-                            }
-                            finally
-                            {
-                                GlobalVarForApp.networkStatusBool = state;
-                            }
-                        Console.WriteLine("唤醒receiveDataThread");
+                        }
+                        //Console.WriteLine("唤醒receiveDataThread");
                     }
                 }
-            }
-
-
 
             //  接收线程
             //在listenSocket 上监听
@@ -190,7 +187,8 @@ namespace zk
                     //Console.WriteLine("rotate");
                     //Console.WriteLine(sendDataThread.ThreadState);
                 }*/
-                sendDataThread.Interrupt();
+                if(GlobalVarForApp.networkStatusBool==true)
+                  sendDataThread.Interrupt();
             }
 
             public static void sendRSDataProc()
@@ -198,9 +196,9 @@ namespace zk
                 string tmp_str = "";
                 byte[] send_buf = new byte[10000];
                 int sendCount = 0;
-                while (GlobalVarForApp.networkStatusBool)       //  networkstatus normal ??
+                RSData tmp = new RSData();
+                while (true)       //
                 {
-                    RSData tmp = new RSData();
                     while(GlobalVarForApp.sendMessageQueue.Count() != 0)
                     {
                             tmp = GlobalVarForApp.sendMessageQueue.Dequeue();
@@ -210,10 +208,12 @@ namespace zk
                             {
                                 sendCount = listenSocket.Send(send_buf, send_buf.Length, SocketFlags.None);
                             }
-                            catch (Exception e)
+                            catch (SocketException e)
                             {
                                 MessageBox.Show("网络故障：发送数据失败");
                                 appLog.exceptionRecord("发送数据失败" + e.Message);
+                                GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
+                                break;
                             }
                             send_buf.Initialize();
                     }
@@ -226,7 +226,7 @@ namespace zk
 
                     }
                 }
-                return;
+                //return;
             }
         }
 }
