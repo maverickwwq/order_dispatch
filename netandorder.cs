@@ -139,13 +139,14 @@ namespace zk
             while (true)
             {
 #if _debug_
-                Console.WriteLine("触发了一次数据处理线程处理");
+                //Console.WriteLine("触发了一次数据处理线程处理");
 #endif
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
                 {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
                                 //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
-
-                    rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
+                    lock(GlobalVarForApp.receiveMessageQueue){
+                      rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
+                    }
                     switch (rcv_rsd.CommType.Trim())
                     {
                         case "LOGIN_REPLY":
@@ -156,15 +157,17 @@ namespace zk
 
                         case "DELETE_USER_REPLY":
                             break;
-                            
+
                         case "DOWN_ORDER":              //把GlobalVarForApp.receiveMessageQueue里的RSD数据整理成tbh_ordersInfoList里的List<OrderInfo>数据
                             tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
                             for(int j=0;j<tmpOI.orderOpNum;j++){
                                 tmpOI.oos[j].orderStatus = OrderStatus.unconfirmed;
                                 tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                             }
-                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
-                            GlobalVarForApp.f.UIrefresh(null,null);
+                            lock(GlobalVarForApp.tbh_ordersInfoList){
+                              GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
+                            }
+                            //GlobalVarForApp.f.UIrefresh(null,null);
                             break;
 
                         case "DOWN_ORDER_REPLY":
@@ -247,15 +250,12 @@ namespace zk
                             break;
 
                     }
-                    // }
                 }
-                try
-                {
+                try{
+                    //GlobalVarForApp.f.UIrefresh(null, null);
                     Thread.Sleep(Timeout.Infinite);
                 }
-                catch (ThreadInterruptedException)
-                {
-                }
+                catch (ThreadInterruptedException){}
             }
         }
 

@@ -27,17 +27,19 @@ namespace zk
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Form1 f = new Form1();
+            GlobalVarForApp.f = f;
             if (program_initial() == false)
             {
                 MessageBox.Show("系统初始化失败，无法启动");
                 return;
             }
-            //System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer.
+            System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(5000);
+            //Hook up the Elapsed event for the timer.
             //界面刷新定时器
-            //UI_refresh_timer.Elapsed += f.UIrefresh;
-            //UI_refresh_timer.AutoReset = true;
-            //UI_refresh_timer.Enabled = true;
+            UI_refresh_timer.Elapsed += f.UIrefresh;
+            UI_refresh_timer.AutoReset = true;
+            UI_refresh_timer.Enabled = true;
 #if _debug_
             Console.WriteLine("--------------界面刷新线程开启");
 #endif
@@ -46,66 +48,10 @@ namespace zk
 
 #endif
 
-            Form1 f = new Form1();
-            GlobalVarForApp.f = f;
+
             Application.Run(f);
 
-            /*
-            //请求获取未处理订单
-            //机房端未接收的，下发机房失败或者尚未下发，机房未反馈的三种状态
-            netandorder.askForAllUnfinishedOrder_send();// waiting for server ,receive the "QUERY_ORDERS_REPLY"
 
-            //  ---------------------------丢弃QUERY_ORDERS_REPLY之前的所有数据包------------------------
-            RSData rsd_tmp = new RSData();//get one QUERY_ORDERS_REPLY
-            while(true){
-                if(GlobalVarForApp.receiveMessageQueue.Count()>0){
-                    rsd_tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();     //丢弃所有包
-                    if (rsd_tmp.CommType == "QUERY_ORDERS_REPLY")                     //直到QUERY_ORDERS_REPLY
-                        break;
-                }
-                Thread.Sleep(1000);//wait for the data to be sent and receive
-            }
-            if (rsd_tmp.query.totalRecords != 0)    //存在未完成状态的调度令       数据存在GLOBALVARFORAPP.tbh_orsersInfoList
-            {
-                int i = 0;
-                foreach(OrderAndOp tmpOao in rsd_tmp.orderAndOpList)
-                {
-                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);     //获取未完成调度令的 od id
-                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);//获取文号
-                    GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;              //获取文号
-                    i++;
-                }
-                for (i = 0; i < GlobalVarForApp.tbh_ordersInfoList.Count(); i++)     //发送query_order_request，
-                {                                                                                                          //请求获取所有未完成调度令的详细信息
-                    Query query=new Query();
-                    query.queryOrderODID=GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID.ToString();
-                    netandorder.query_order_request_send(query);
-                }
-                // i代表未完成调度令的数量
-                while (i == 0)
-                {
-                    if (GlobalVarForApp.receiveMessageQueue.Count() > 0)
-                    {
-                        rsd_tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();
-                        if (rsd_tmp.CommType == "QUERY_ORDER_REPLY")
-                        {
-                            i--;
-                            for (int j = 0; j < GlobalVarForApp.tbh_ordersInfoList.Count(); j++)
-                            {
-                                if (GlobalVarForApp.tbh_ordersInfoList[j].orderInfo.OD_ID == rsd_tmp.order.OD_ID)
-                                {
-                                    GlobalVarForApp.tbh_ordersInfoList[j].orderInfo = rsd_tmp.order;
-                                    GlobalVarForApp.tbh_ordersInfoList[j].orderInstructionList = rsd_tmp.orderOpList;
-                                }
-                            }
-                        }
-                    }
-                    Thread.Sleep(1000);
-                }
-            }
-            Console.WriteLine("主线程在这里结束");
-            Thread.Sleep(Timeout.Infinite);
-             */
         }
 
         private static bool program_initial()       //系统初始化   成功返回true 失败false
@@ -160,3 +106,66 @@ namespace zk
 
     }
 }
+
+
+
+
+
+
+
+/*
+//请求获取未处理订单
+//机房端未接收的，下发机房失败或者尚未下发，机房未反馈的三种状态
+netandorder.askForAllUnfinishedOrder_send();// waiting for server ,receive the "QUERY_ORDERS_REPLY"
+
+//  ---------------------------丢弃QUERY_ORDERS_REPLY之前的所有数据包------------------------
+RSData rsd_tmp = new RSData();//get one QUERY_ORDERS_REPLY
+while(true){
+    if(GlobalVarForApp.receiveMessageQueue.Count()>0){
+        rsd_tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();     //丢弃所有包
+        if (rsd_tmp.CommType == "QUERY_ORDERS_REPLY")                     //直到QUERY_ORDERS_REPLY
+            break;
+    }
+    Thread.Sleep(1000);//wait for the data to be sent and receive
+}
+if (rsd_tmp.query.totalRecords != 0)    //存在未完成状态的调度令       数据存在GLOBALVARFORAPP.tbh_orsersInfoList
+{
+    int i = 0;
+    foreach(OrderAndOp tmpOao in rsd_tmp.orderAndOpList)
+    {
+        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);     //获取未完成调度令的 od id
+        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);//获取文号
+        GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;              //获取文号
+        i++;
+    }
+    for (i = 0; i < GlobalVarForApp.tbh_ordersInfoList.Count(); i++)     //发送query_order_request，
+    {                                                                                                          //请求获取所有未完成调度令的详细信息
+        Query query=new Query();
+        query.queryOrderODID=GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID.ToString();
+        netandorder.query_order_request_send(query);
+    }
+    // i代表未完成调度令的数量
+    while (i == 0)
+    {
+        if (GlobalVarForApp.receiveMessageQueue.Count() > 0)
+        {
+            rsd_tmp = GlobalVarForApp.receiveMessageQueue.Dequeue();
+            if (rsd_tmp.CommType == "QUERY_ORDER_REPLY")
+            {
+                i--;
+                for (int j = 0; j < GlobalVarForApp.tbh_ordersInfoList.Count(); j++)
+                {
+                    if (GlobalVarForApp.tbh_ordersInfoList[j].orderInfo.OD_ID == rsd_tmp.order.OD_ID)
+                    {
+                        GlobalVarForApp.tbh_ordersInfoList[j].orderInfo = rsd_tmp.order;
+                        GlobalVarForApp.tbh_ordersInfoList[j].orderInstructionList = rsd_tmp.orderOpList;
+                    }
+                }
+            }
+        }
+        Thread.Sleep(1000);
+    }
+}
+Console.WriteLine("主线程在这里结束");
+Thread.Sleep(Timeout.Infinite);
+ */

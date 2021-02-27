@@ -1,4 +1,4 @@
-﻿#define   _debug_
+﻿//#define   _debug_
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +16,8 @@ namespace zk
 {
     public partial class Form1 : Form
     {
+        static DateTime lastRun = DateTime.Now;
+        static List<OrderInfo> ordersInfoListBuffer =new List<OrderInfo>();
         public Form1()
         {
             InitializeComponent();
@@ -71,17 +73,14 @@ namespace zk
 
         public delegate void UI_refresh_delegate();
         public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
-        {                                                                    //同时不会产生错误
+        {
 #if _debug_
-           // Console.WriteLine("界面刷新");
+            Console.WriteLine("什么时候调用的?");
 #endif
-            try
-            {
+              try{
                 tbd_OrderInfo_dgv.BeginInvoke(new UI_refresh_delegate(tbd_OrderInfo_display));
-            }
-            catch (Exception)
-            {
-            }
+              }
+              catch (Exception){}
         }
 
         //------------------------------------------------------------------------------------------------
@@ -89,91 +88,99 @@ namespace zk
         //------------------------------------------------------------------------------------------------
         public void tbd_OrderInfo_display()
         {
-            if (GlobalVarForApp.tbh_ordersInfoList.Count == 0)         //无待处理调度令返回
-                return;
-            else   //有待处理调度令
-            {
-                tbd_OrderInfo_dgv.Rows.Clear();     //先清空
-                int ordersCount = 0;                          //
-                foreach (OrderInfo tmpOrInfo in GlobalVarForApp.tbh_ordersInfoList)
-                {
-                    tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[0].Value = (ordersCount+1).ToString();        //第一列 序号 按调度令增序排列
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderCode;//第二列调度令号
-                    bool gudingrenwuBool=false;
-                    /*foreach(Order_Op_Content ooc in tmpOrInfo.ooc)
-                    {
-                      ooc=new Order_Op_Content();
-                      Console.WriteLine("---_______----------------------_____------");
-                      Console.WriteLine(ooc.startDate);
-                      Console.WriteLine(ooc.endDate);
-                      if(ooc.startDate.Equals(ooc.endDate))   //true临时调度   false固定
-                      {
-
-                      }
-                      else
-                      {
-                        gudingrenwuBool=true;
-                        break;
-                      }
-                    }*/
-                    string tmp="";
-                    for (int i=0; i< tmpOrInfo.orderOpNum; i++)
-                    {
-                      tmp=tmp+tmpOrInfo.ooc[i].transCode+" ";
-                      if(tmpOrInfo.ooc[i].startDate.Equals(tmpOrInfo.ooc[i].endDate))
-                        continue;
-                      else
-                      {
-                        gudingrenwuBool=true;
-                      }
-                    }
-                    if(gudingrenwuBool==true)
-                      tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value="固";
-                    else
-                      tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value="临";
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value=tmp;
-                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = tmpOrInfo.ooc[0].transCode.Trim();
-/*
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.Font = new Font("宋体", 12, FontStyle.Bold);       //调度令状态
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Red;
-                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Red;
-                    switch(tmpOrInfo.orderStatus)
-                    {
-                        case OrderStatus.unconfirmed:
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = "未确认接收";
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
-                            break;
-                        case OrderStatus.confirmed_noFeedback:
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Blue;
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Blue;
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = "已接收未反馈";
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
-                            break;
-                        case OrderStatus.feedback:
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Green;
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Green;
-                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "已反馈";
-
-
-                                      if(){//开启则显示时间                                      //         未完成！！！！！！！！！！！！！！！！！！！！！
-                                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
-                            }
-                            else{//无法开启则显示原因
-                                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
-                            }
-
-                            break;
-                    }*/
-
-                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[5].Value = tmpOrInfo.orderInstruction.AN_ID;                       //天线
-                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = "待完成";
-                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = tmpOrInfo.infoReturn;
-                    //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = tmpOrInfo.commTime;
-                    ordersCount++;
-                }
+            List<OrderInfo> ordersInfoTmp = new List<OrderInfo>();
+            ordersInfoTmp=GlobalVarForApp.tbh_ordersInfoList;
+#if _debug_
+            Console.WriteLine(ordersInfoTmp.Count);
+            Console.WriteLine(ordersInfoListBuffer.Count);
+#endif
+            if (ordersInfoListBuffer == ordersInfoTmp || ordersInfoTmp.Count == 0){          //当前界面显示数据与全局变量一 或者调度令没有更新，无需刷新
+                    return;                                          
             }
+
+#if _debug_
+            Console.WriteLine("--界面刷新开始");
+            Console.WriteLine(DateTime.Now.Ticks);
+#endif
+            tbd_OrderInfo_dgv.Rows.Clear();     //先清空
+            int ordersCount = 0;                          //
+            foreach (OrderInfo tmpOrInfo in ordersInfoTmp)
+            {
+                tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
+                tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
+                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[0].Value = (ordersCount + 1).ToString();        //第一列 序号 按调度令增序排列
+                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderCode;//第二列调度令号
+                bool gudingrenwuBool = false;
+                /*foreach(Order_Op_Content ooc in tmpOrInfo.ooc){
+                  ooc=new Order_Op_Content();
+                  Console.WriteLine("---_______----------------------_____------");
+                  Console.WriteLine(ooc.startDate);
+                  Console.WriteLine(ooc.endDate);
+                  if(ooc.startDate.Equals(ooc.endDate)){}
+                  else{
+                    gudingrenwuBool=true;
+                    break;
+                  }
+                }*/
+                string tmp = "";
+                for (int i = 0; i < tmpOrInfo.orderOpNum; i++)
+                {
+                    tmp = tmp + tmpOrInfo.ooc[i].transCode + " ";
+                    if (tmpOrInfo.ooc[i].startDate.Equals(tmpOrInfo.ooc[i].endDate))
+                        continue;
+                    else
+                    {
+                        gudingrenwuBool = true;
+                    }
+                }
+                if (gudingrenwuBool == true)
+                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = "固";
+                else
+                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = "临";
+                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = tmp;
+                //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = tmpOrInfo.ooc[0].transCode.Trim();
+                /*
+                                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.Font = new Font("宋体", 12, FontStyle.Bold);       //调度令状态
+                                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Red;
+                                    tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Red;
+                                    switch(tmpOrInfo.orderStatus)
+                                    {
+                                        case OrderStatus.unconfirmed:
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = "未确认接收";
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
+                                            break;
+                                        case OrderStatus.confirmed_noFeedback:
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Blue;
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Blue;
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = "已接收未反馈";
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
+                                            break;
+                                        case OrderStatus.feedback:
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.ForeColor = Color.Green;
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Style.SelectionForeColor = Color.Green;
+                                            tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "已反馈";
+
+
+                                                      if(){//开启则显示时间                                      //         未完成！！！！！！！！！！！！！！！！！！！！！
+                                                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
+                                            }
+                                            else{//无法开启则显示原因
+                                                tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = "--";
+                                            }
+
+                                            break;
+                                    }*/
+
+                //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[5].Value = tmpOrInfo.orderInstruction.AN_ID;                       //天线
+                //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[2].Value = "待完成";
+                //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[3].Value = tmpOrInfo.infoReturn;
+                //tbd_OrderInfo_dgv.Rows[ordersCount].Cells[4].Value = tmpOrInfo.commTime;
+                ordersCount++;
+            }
+#if _debug_
+            Console.WriteLine("--界面刷新结束");
+#endif
+            ordersInfoListBuffer = ordersInfoTmp;
             return;
         }
 

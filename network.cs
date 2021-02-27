@@ -66,7 +66,7 @@ namespace zk
                 }
                 catch (ThreadInterruptedException) { }
                 //被唤醒之后
-                bool state=GlobalVarForApp.networkStatusBool;
+                  bool state=GlobalVarForApp.networkStatusBool;
                 while (true)
                 {
                     if (state == true)//网络恢复后，进入无限等待，等唤醒
@@ -78,7 +78,7 @@ namespace zk
                         {
                             receiveDataThread.Interrupt();      //重连成功，开启接收线程
                             //sendDataThread.Interrupt();
-                            GlobalVarForApp.networkStatusBool=state;
+                            GlobalVarForApp.networkStatusBool=true;
                             Thread.Sleep(Timeout.Infinite);
                         }
                         catch (ThreadInterruptedException)
@@ -158,22 +158,29 @@ namespace zk
                   }
                     message = message.Trim()+u8.GetString(messageBuf,0,messageCount).Trim();
 #if _debug_
-                    Console.Write(message);
+                    //Console.Write(message);
 #endif
-                    a = message.IndexOf("DataEnd");                                         //数据是否有DataEnd
-                    if (a != -1)                       //数据中存在DataEnd
+                  a = message.IndexOf("DataEnd");
+                  bool refreshUI=false;
+                  while(a!=-1){
+                    refreshUI=true;
+                    try
                     {
-                        try
-                        {
-                            GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));       //获取有效数据
-                            message = message.Substring(a + 7);
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show(e.Message);
-                        }
-                       GlobalVarForApp.messageHandle_thread.Interrupt();
+                        GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));       //获取有效数据
+                        message = message.Substring(a + 7);
                     }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message);
+                    }
+                    a = message.IndexOf("DataEnd");
+
+                  }
+                  if (refreshUI == true)
+                  {
+                      Console.WriteLine("messageHandle");
+                      GlobalVarForApp.messageHandle_thread.Interrupt();
+                  }
                 }
             }
 
