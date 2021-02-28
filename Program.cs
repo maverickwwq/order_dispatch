@@ -34,7 +34,7 @@ namespace zk
                 MessageBox.Show("系统初始化失败，无法启动");
                 return;
             }
-            System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(5000);
+            System.Timers.Timer UI_refresh_timer = new System.Timers.Timer(1000);
             //Hook up the Elapsed event for the timer.
             //界面刷新定时器
             UI_refresh_timer.Elapsed += f.UIrefresh;

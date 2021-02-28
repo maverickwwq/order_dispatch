@@ -97,12 +97,11 @@ namespace zk
             if (ordersInfoListBuffer == ordersInfoTmp || ordersInfoTmp.Count == 0){          //当前界面显示数据与全局变量一 或者调度令没有更新，无需刷新
                     return;                                          
             }
-
 #if _debug_
             Console.WriteLine("--界面刷新开始");
             Console.WriteLine(DateTime.Now.Ticks);
 #endif
-            tbd_OrderInfo_dgv.Rows.Clear();     //先清空
+            tbd_OrderInfo_dgv.Rows.Clear();        //先清空
             int ordersCount = 0;                          //
             foreach (OrderInfo tmpOrInfo in ordersInfoTmp)
             {
