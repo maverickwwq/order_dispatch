@@ -113,7 +113,6 @@ namespace zk
                               }
                             }
                         }
-                        //Console.WriteLine("唤醒receiveDataThread");
                     }
                 }
 
@@ -157,6 +156,7 @@ namespace zk
                     continue;
                   }
                     message = message.Trim()+u8.GetString(messageBuf,0,messageCount).Trim();
+                    //Console.WriteLine(message);
 #if _debug_
                     //Console.Write(message);
 #endif
@@ -186,16 +186,12 @@ namespace zk
 
             public static void sendData(RSData dataToSend)
             {
-                GlobalVarForApp.sendMessageQueue.Enqueue(dataToSend);
-                //sendDataThread is running ?
-                /*while (sendDataThread.ThreadState == ThreadState.Running)  //is running
-                {
-                    Thread.Sleep(100);
-                    //Console.WriteLine("rotate");
-                    //Console.WriteLine(sendDataThread.ThreadState);
-                }*/
+                lock(GlobalVarForApp.sendMessageQueue){
+                  GlobalVarForApp.sendMessageQueue.Enqueue(dataToSend);
+                }
                 if(GlobalVarForApp.networkStatusBool==true)
                   sendDataThread.Interrupt();
+                return;
             }
 
             public static void sendRSDataProc()
@@ -208,30 +204,28 @@ namespace zk
                 {
                     while(GlobalVarForApp.sendMessageQueue.Count() != 0)
                     {
-                            tmp = GlobalVarForApp.sendMessageQueue.Dequeue();
-                            tmp_str = JsonConvert.SerializeObject(tmp, Formatting.Indented, setting)+ "DataEnd" ;
-                            send_buf = u8.GetBytes(tmp_str);
-                            try
-                            {
-                                sendCount = listenSocket.Send(send_buf, send_buf.Length, SocketFlags.None);
-                            }
-                            catch (SocketException e)
-                            {
-                                MessageBox.Show("网络故障：发送数据失败");
-                                appLog.exceptionRecord("发送数据失败" + e.Message);
-                                GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
-                                break;
-                            }
-                            send_buf.Initialize();
+                        lock(GlobalVarForApp.sendMessageQueue){
+                          tmp = GlobalVarForApp.sendMessageQueue.Dequeue();
+                        }
+                        tmp_str = JsonConvert.SerializeObject(tmp, Formatting.Indented, setting)+ "DataEnd" ;
+                        send_buf = u8.GetBytes(tmp_str);
+                        try{
+                            sendCount = listenSocket.Send(send_buf, send_buf.Length, SocketFlags.None);
+                        }
+                        catch (SocketException e){
+                            MessageBox.Show("网络故障：发送数据失败");
+                            appLog.exceptionRecord("发送数据失败" + e.Message);
+                            GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
+                            break;
+                        }
+                        //Console.WriteLine(send_buf.Length);
+                        Array.Clear(send_buf,0,send_buf.Length);                  
+                        //send_buf.Initialize();
                     }
-                    try
-                    {
+                    try{
                         Thread.Sleep(Timeout.Infinite);//发送数据队列为空，线程被阻止
                     }
-                    catch (Exception)
-                    {
-
-                    }
+                    catch (Exception){}
                 }
                 //return;
             }

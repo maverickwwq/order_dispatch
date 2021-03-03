@@ -1,4 +1,4 @@
-﻿//#define   _debug_
+﻿#define   _debug_
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -75,7 +75,7 @@ namespace zk
         public void UIrefresh(Object source, ElapsedEventArgs e)             //其他的线程可以调用该方法用来改变界面的数值，
         {
 #if _debug_
-            Console.WriteLine("什么时候调用的?");
+        //Console.WriteLine("什么时候调用的?");
 #endif
               try{
                 tbd_OrderInfo_dgv.BeginInvoke(new UI_refresh_delegate(tbd_OrderInfo_display));
@@ -88,22 +88,42 @@ namespace zk
         //------------------------------------------------------------------------------------------------
         public void tbd_OrderInfo_display()
         {
-            List<OrderInfo> ordersInfoTmp = new List<OrderInfo>();
-            ordersInfoTmp=GlobalVarForApp.tbh_ordersInfoList;
 #if _debug_
-            Console.WriteLine(ordersInfoTmp.Count);
-            Console.WriteLine(ordersInfoListBuffer.Count);
+            //Console.WriteLine(GlobalVarForApp.tbh_ordersInfoList.Count);
+            //Console.WriteLine(ordersInfoListBuffer.Count);
 #endif
-            if (ordersInfoListBuffer == ordersInfoTmp || ordersInfoTmp.Count == 0){          //当前界面显示数据与全局变量一 或者调度令没有更新，无需刷新
-                    return;                                          
+            if (GlobalVarForApp.tbh_ordersInfoList.Count == 0){          //当前界面显示数据与全局变量一 或者调度令没有更新，无需刷新
+                    return;
+            }
+
+            if (GlobalVarForApp.tbh_ordersInfoList.Count == ordersInfoListBuffer.Count)
+            {
+                bool theyAreTheSame = true;
+                for (int j = 0; j < ordersInfoListBuffer.Count; j++)
+                {
+                    if (GlobalVarForApp.tbh_ordersInfoList[j] != ordersInfoListBuffer[j])
+                    {
+                        theyAreTheSame = false;
+                        break;
+                    }
+                }
+                if (theyAreTheSame == true)
+                {
+                    return;
+                }
+            }
+              ordersInfoListBuffer.Clear();
+            lock(GlobalVarForApp.tbh_ordersInfoList){
+              for(int j=0;j<GlobalVarForApp.tbh_ordersInfoList.Count;j++)
+                ordersInfoListBuffer.Add(GlobalVarForApp.tbh_ordersInfoList[j]);
             }
 #if _debug_
-            Console.WriteLine("--界面刷新开始");
-            Console.WriteLine(DateTime.Now.Ticks);
+            //Console.WriteLine("--界面刷新开始");
+            //Console.WriteLine(DateTime.Now.Ticks);
 #endif
             tbd_OrderInfo_dgv.Rows.Clear();        //先清空
             int ordersCount = 0;                          //
-            foreach (OrderInfo tmpOrInfo in ordersInfoTmp)
+            foreach (OrderInfo tmpOrInfo in ordersInfoListBuffer)
             {
                 tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
                 tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
@@ -177,9 +197,8 @@ namespace zk
                 ordersCount++;
             }
 #if _debug_
-            Console.WriteLine("--界面刷新结束");
+            //Console.WriteLine("--界面刷新结束");
 #endif
-            ordersInfoListBuffer = ordersInfoTmp;
             return;
         }
 

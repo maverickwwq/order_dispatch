@@ -31,7 +31,7 @@ namespace zk
             tmp.CommTime = System.DateTime.Now.ToString();
             tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
             tmp.currentUser = GlobalVarForApp.currentUserStr;
-            tmp.orderRecordList = orderRecordList;
+            //tmp.orderRecordList = orderRecordList;
             //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
             //network.sendRSDataProc();
             network.sendData(tmp);
@@ -138,9 +138,6 @@ namespace zk
             //OrderInfo tmpOI = new OrderInfo();      //调度令信息
             while (true)
             {
-#if _debug_
-                //Console.WriteLine("触发了一次数据处理线程处理");
-#endif
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
                 {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
                                 //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
@@ -166,10 +163,22 @@ namespace zk
                             }
                             lock(GlobalVarForApp.tbh_ordersInfoList){
                               GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
+                              GlobalVarForApp.tbh_ordersInfoList.Sort();
                             }
+                            RSData sendTmp=new RSData();
+                            sendTmp.CommType="RECEIVE_ORDER_REPLY";
+                            sendTmp.CommTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            sendTmp.CommDept=GlobalVarForApp.client_type;
+                            sendTmp.order=new Order();
+                            sendTmp.order.orderId=rcv_rsd.order.orderId;
+                            sendTmp.order.orderCode=rcv_rsd.order.orderCode;
+                            sendTmp.order.orderRecordList = new List<OrderRecord>();
+                            OrderRecord orTmp = new OrderRecord();
+                            orTmp.orderNumId = rcv_rsd.order.orderOpList[0].orderNumId;
+                            sendTmp.order.orderRecordList.Add(orTmp);
+                            network.sendData(sendTmp);
                             //GlobalVarForApp.f.UIrefresh(null,null);
                             break;
-
                         case "DOWN_ORDER_REPLY":
                             //MessageBox.Show("Down order reply");
                             //接收到服务器发送的接收调度令确认数据
