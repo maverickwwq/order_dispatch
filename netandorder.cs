@@ -135,14 +135,13 @@ namespace zk
 #endif
             RSData rcv_rsd = new RSData();
             OrderInfo tmpOI;
-            //OrderInfo tmpOI = new OrderInfo();      //调度令信息
             while (true)
             {
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
                 {               //"LOGIN_REPLY"     "ADD_USER_REPLY"      "DELETE_USER_REPLY"
                                 //"DOWN_ORDER"      "QUERY_ORDER_REPLY"     "NEW_MESSAGE"
                     lock(GlobalVarForApp.receiveMessageQueue){
-                      rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();
+                      rcv_rsd = GlobalVarForApp.receiveMessageQueue.Dequeue();    //最早接收到的rsdata数据
                     }
                     switch (rcv_rsd.CommType.Trim())
                     {
@@ -157,16 +156,14 @@ namespace zk
 
                         case "DOWN_ORDER":              //把GlobalVarForApp.receiveMessageQueue里的RSD数据整理成tbh_ordersInfoList里的List<OrderInfo>数据
                             tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
-                            for(int j=0;j<tmpOI.orderOpNum;j++){
-                                tmpOI.oos[j].orderStatus = OrderStatus.unconfirmed;
-                                tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                            }
+                            tmpOI.setRecTime();
+                            tmpOI.setOdStatus(OrderStatus.sysReceive);
                             lock(GlobalVarForApp.tbh_ordersInfoList){
                               GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
-                              GlobalVarForApp.tbh_ordersInfoList.Sort();
+                              GlobalVarForApp.tbh_ordersInfoList.Sort();        //对tbh进行排序
                             }
-                            RSData sendTmp=new RSData();
-                            sendTmp.CommType="RECEIVE_ORDER_REPLY";
+                            RSData sendTmp=new RSData();              //send "RECEIVE_ORDER"
+                            sendTmp.CommType="RECEIVE_ORDER";
                             sendTmp.CommTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                             sendTmp.CommDept=GlobalVarForApp.client_type;
                             sendTmp.order=new Order();
@@ -174,86 +171,40 @@ namespace zk
                             sendTmp.order.orderCode=rcv_rsd.order.orderCode;
                             sendTmp.order.orderRecordList = new List<OrderRecord>();
                             OrderRecord orTmp = new OrderRecord();
-                            orTmp.orderNumId = rcv_rsd.order.orderOpList[0].orderNumId;
-                            sendTmp.order.orderRecordList.Add(orTmp);
+                            for(int j=0;j<rcv_rsd.order.orderOpList.Count;j++){
+                              orTmp.orderNumId = rcv_rsd.order.orderOpList[j].orderNumId;
+                              sendTmp.order.orderRecordList.Add(orTmp);
+                            }
                             network.sendData(sendTmp);
                             //GlobalVarForApp.f.UIrefresh(null,null);
                             break;
+
+                        case "RECEIVE_ORDER_REPLY":              //
+                            tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
+                            lock(GlobalVarForApp.tbh_ordersInfoList){
+                              foreach(OrderInfo oi in GlobalVarForApp.tbh_ordersInfoList){
+                                  if(oi.orderID==rcv_rsd.order.orderId){
+                                    //oi.oos.orStatus=OrderStatus.unconfirmed;
+                                    oi.setOdStatus(OrderStatus.unconfirmed);
+                                    oi.setRecTime();
+                                  }
+                              }
+                            }
+                            break;
                         case "DOWN_ORDER_REPLY":
-                            //MessageBox.Show("Down order reply");
-                            //接收到服务器发送的接收调度令确认数据
-                            //1、 确认是否与客户端存在的调度令数据一致，不一致以
-                            //         这次接收的数据为准
-                            //2、    客户端不存在该调度令的数据，将数据存入全局变量tbh_ordersInfoList
-                            //3、  对tbh_ordersInfoList进行排序
-                            tmpOI = new OrderInfo(rcv_rsd.order);
-                            for(int j=0;j<tmpOI.oos.GetLength(0);j++){
-                                tmpOI.oos[j].orderStatus = OrderStatus.unconfirmed;
-                                tmpOI.oos[j].clientReceiveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                            }
-                            /* //已经存在该调度令，用最新的数据覆盖该调度令
-                           if()
-                           {
-                           }
-                            */
-                            GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                            //对orInfo全局变量按调度令号进行排序
-                            if (GlobalVarForApp.tbh_ordersInfoList.Count > 1)
-                            {
-                                //GlobalVarForApp.tbh_ordersInfoList.Sort(CompareOrderByOrderID);
-                            }
-                            //od_dis.od_dis_show();            //新调度令显示
-                            // Form1.tbd_OrderInfo_display();
-
-                            //
-                            //接收到新调度语音提示
-                            //
-
                             break;
 
-
                         case "QUERY_ORDERS_REPLY":      //批量查询
-                            //调度令信息
-                            List<OrderAndOp> tmpOaoList = new List<OrderAndOp>();
-                            //tmpOaoList = query_orders_reply_receive(rcv_rsd);
-                            if (rcv_rsd.query.pageSize == 100)      //系统初始化时查询所有未完成调度令
-                            {
-                                //清空全局变量     tbh_orderInfo
-                                if (tmpOaoList.Count() != 0)       //非空链条
-                                {
-                                    int i = 0;
-                                    foreach (OrderAndOp tmpOao in tmpOaoList)//获取所有未完成调度令的od_id  od_year od_code
-                                    {
-                                        //GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.OD_ID = int.Parse(tmpOao.odId);
-                                        //GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_YEAR = int.Parse(tmpOao.orderYear);
-                                       //GlobalVarForApp.tbh_ordersInfoList[i].orderInfo.ORDER_CODE = tmpOao.orderCode;
-                                        i++;
-                                    }
-                                }
-                            }
-                            else                              //调度令查询功能
-                            {
-
-                            }
                             break;
 
                         case "QUERY_ORDER_REPLY":         //单个查询
                             //调度令信息
-
                             break;
-
                         case "NEW_MESSAGE":
                             break;
 
-                        case "RECEIVE_ORDER_REPLY":
-                            //提取调度令信息
-                            //tmpOI.commTime = rcv_rsd.CommTime;
-                            //tmpOI.orderInfo = rcv_rsd.order;
-                            //tmpOI.infoReturn = rcv_rsd.infoReturn;
-                            //tmpOI.orderStatus = OrderStatus.confirmed_noFeedback;        //设置调度令状态信息    未接收确认状态
-                            //GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);                      //添加到调度令信息
-                            //tbd_OrderInfo_display();
-                            break;
+                        case "CONFIRM_ORDER_REPLY":
+
 
                         default: /* 可选的 */
                             break;

@@ -156,7 +156,6 @@ namespace zk
                     continue;
                   }
                     message = message.Trim()+u8.GetString(messageBuf,0,messageCount).Trim();
-                    //Console.WriteLine(message);
 #if _debug_
                     //Console.Write(message);
 #endif
@@ -169,12 +168,10 @@ namespace zk
                         GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));       //获取有效数据
                         message = message.Substring(a + 7);
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e){
                         MessageBox.Show(e.Message);
                     }
                     a = message.IndexOf("DataEnd");
-
                   }
                   if (refreshUI == true)
                   {
@@ -219,7 +216,7 @@ namespace zk
                             break;
                         }
                         //Console.WriteLine(send_buf.Length);
-                        Array.Clear(send_buf,0,send_buf.Length);                  
+                        Array.Clear(send_buf,0,send_buf.Length);
                         //send_buf.Initialize();
                     }
                     try{

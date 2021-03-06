@@ -69,7 +69,7 @@ namespace zk
             for (int j = 0; j < tmpOI.orderOpNum; j++)
             {
                 orderInfo_dgv.Rows.Add(1);
-                orderInfo_dgv.Rows[j].Cells[0].Value = (j + 1).ToString();
+                orderInfo_dgv.Rows[j].Cells[0].Value = tmpOI.ooc[j].orderNum;
                 orderInfo_dgv.Rows[j].Cells[1].Value = tmpOI.ooc[j].transCode;
                 orderInfo_dgv.Rows[j].Cells[2].Value = tmpOI.ooc[j].power.ToString();
                 orderInfo_dgv.Rows[j].Cells[3].Value = tmpOI.ooc[j].startTime + "-" + tmpOI.ooc[j].endTime;
@@ -86,6 +86,22 @@ namespace zk
                 orderInfo_dgv.Rows[j].Cells[14].Value = tmpOI.ooc[j].endDate;
                 orderInfo_dgv.Rows[j].Cells[15].Value = tmpOI.ooc[j].orderType;
                 orderInfo_dgv.Rows[j].Cells[16].Value = tmpOI.ooc[j].orderRmks;
+            }
+            switch (tmpOI.oos[0].orderStatus){
+                case OrderStatus.sysReceive:
+                    check_btn.Text = "接收";
+                    check_btn.Enabled = false;
+                    break;
+
+                case OrderStatus.unconfirmed:           //系统已接收，尚未点击接收确认
+                    check_btn.Enabled = true;
+                    break;
+
+                case OrderStatus.confirmed_noFeedback:
+                    break;
+
+                case OrderStatus.feedbacked:
+                    break;
             }
         }
     }

@@ -7,7 +7,7 @@ using DispatchServer.BaseUtil;
 
 namespace DispatchServer
 {
-    public class OrderOp
+    public class OrderOp: IComparable
     {
         public int ID;
         public int orderId;//调度令ID
@@ -270,6 +270,15 @@ namespace DispatchServer
             this.updateTime=updateTime;
             this.dealed=dealed;
             this.operation=operation;
+        }
+
+        public int CompareTo(object other)
+        {
+            //Console.WriteLine("a");
+            if (other == null)
+                return 1;
+            OrderOp otherOI = other as OrderOp;
+            return this.num.CompareTo(otherOI.num);
         }
     }
 }

@@ -31,6 +31,7 @@
             this.orderInfo_dgv = new System.Windows.Forms.DataGridView();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.check_btn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.orderInfo_dgv)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,7 +46,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(638, 621);
+            this.button1.Location = new System.Drawing.Point(863, 543);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(165, 56);
             this.button1.TabIndex = 1;
@@ -62,11 +63,21 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "label1";
             // 
+            // check_btn
+            // 
+            this.check_btn.Location = new System.Drawing.Point(453, 543);
+            this.check_btn.Name = "check_btn";
+            this.check_btn.Size = new System.Drawing.Size(165, 56);
+            this.check_btn.TabIndex = 3;
+            this.check_btn.Text = "button2";
+            this.check_btn.UseVisualStyleBackColor = true;
+            // 
             // orderInfoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1439, 774);
+            this.Controls.Add(this.check_btn);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.orderInfo_dgv);
@@ -84,5 +95,6 @@
         private System.Windows.Forms.DataGridView orderInfo_dgv;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button check_btn;
     }
 }
