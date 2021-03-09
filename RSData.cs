@@ -9,7 +9,6 @@ namespace DispatchServer
 {
     public class RSData
     {
-        
         public string CommType = "";//通讯类型的定义
         public string CommTime = "";//通讯时间的定义
         public string CommDept = "";//通讯机房代码定义
@@ -29,7 +28,7 @@ namespace DispatchServer
         //-------------------------------------------------------------------------------------------------------------------
         public List<Order> orderList = null;//调度令(多个)
         //-------------------------------------------------------------------------------------------------------------------
-        
+
         public string newMessage = null;//新消息提醒内容
 
         //查询相关
@@ -37,7 +36,7 @@ namespace DispatchServer
 
         //系统标识
         public bool ifRequestSucess = false;//请求操作是否成功
-       
+
         public RSData()
         {
         }

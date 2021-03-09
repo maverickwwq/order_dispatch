@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DispatchServer;
+using DispatchServer.BaseClass;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +13,9 @@ namespace zk
 {
     public partial class orderInfoForm : Form
     {
+        public OrderInfo tmp;
+        public int OrderIndex = -1;
+        //private OrderInfo orderDisplay;
         public orderInfoForm()
         {
             InitializeComponent();
@@ -26,9 +31,10 @@ namespace zk
 
         }
 
-        public orderInfoForm(int i)
+        public orderInfoForm(int index)
         {
             InitializeComponent();
+            OrderIndex = index;
             this.StartPosition = FormStartPosition.CenterScreen;
             //调度令表格显示格式
             orderInfo_dgv.ReadOnly = true;
@@ -64,7 +70,7 @@ namespace zk
             orderInfo_dgv.Columns[16].Name = "备注";
 
             OrderInfo tmpOI = new OrderInfo();
-            tmpOI = GlobalVarForApp.tbh_ordersInfoList[i];
+            tmpOI = GlobalVarForApp.tbh_ordersInfoList[index];
             label1.Text = tmpOI.orderCode;
             for (int j = 0; j < tmpOI.orderOpNum; j++)
             {
@@ -94,6 +100,7 @@ namespace zk
                     break;
 
                 case OrderStatus.unconfirmed:           //系统已接收，尚未点击接收确认
+                    check_btn.Text = "接收";
                     check_btn.Enabled = true;
                     break;
 
@@ -102,6 +109,40 @@ namespace zk
 
                 case OrderStatus.feedbacked:
                     break;
+            }
+        }
+
+        private void check_btn_Click(object sender, EventArgs e)
+        {
+            //MessageBox.Show(sender.ToString()+e.ToString());
+            if (check_btn.Text == "接收")
+            {
+                GlobalVarForApp.tbh_ordersInfoList[OrderIndex].setOdStatus(OrderStatus.confirmed_noFeedback);
+
+                RSData sendTmp=new RSData();              //send "RECEIVE_ORDER"
+                sendTmp.CommType="CONFIRM_ORDER";
+                sendTmp.CommTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                sendTmp.CommDept=GlobalVarForApp.client_type;
+                sendTmp.order=new Order();
+                sendTmp.order.orderId=GlobalVarForApp.tbh_ordersInfoList[OrderIndex].orderID;
+                sendTmp.order.orderCode = GlobalVarForApp.tbh_ordersInfoList[OrderIndex].orderCode;
+                sendTmp.order.orderRecordList = new List<OrderRecord>();
+
+                for (int j = 0; j < GlobalVarForApp.tbh_ordersInfoList[OrderIndex].orderOpNum; j++)
+                {
+                  OrderRecord orTmp = new OrderRecord();
+                  //orTmp.orderNumId = rcv_rsd.order.orderOpList[j].orderNumId;
+                  sendTmp.order.orderRecordList.Add(orTmp);
+                }
+                network.sendData(sendTmp);
+
+
+                //send confirm_order
+                check_btn.Text = "反馈";
+            }
+            else if (check_btn.Text == "反馈")
+            {
+                MessageBox.Show(OrderIndex.ToString());
             }
         }
     }

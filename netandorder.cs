@@ -170,8 +170,9 @@ namespace zk
                             sendTmp.order.orderId=rcv_rsd.order.orderId;
                             sendTmp.order.orderCode=rcv_rsd.order.orderCode;
                             sendTmp.order.orderRecordList = new List<OrderRecord>();
-                            OrderRecord orTmp = new OrderRecord();
+
                             for(int j=0;j<rcv_rsd.order.orderOpList.Count;j++){
+                              OrderRecord orTmp = new OrderRecord();
                               orTmp.orderNumId = rcv_rsd.order.orderOpList[j].orderNumId;
                               sendTmp.order.orderRecordList.Add(orTmp);
                             }
@@ -180,14 +181,15 @@ namespace zk
                             break;
 
                         case "RECEIVE_ORDER_REPLY":              //
+                            Console.WriteLine("receive order reply");
                             tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
+                            int index=-1;
                             lock(GlobalVarForApp.tbh_ordersInfoList){
-                              foreach(OrderInfo oi in GlobalVarForApp.tbh_ordersInfoList){
-                                  if(oi.orderID==rcv_rsd.order.orderId){
-                                    //oi.oos.orStatus=OrderStatus.unconfirmed;
-                                    oi.setOdStatus(OrderStatus.unconfirmed);
-                                    oi.setRecTime();
-                                  }
+                              index=GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
+                              if(index != -1){
+                                    Console.WriteLine("find order");
+                                    GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.unconfirmed);
+                                    GlobalVarForApp.tbh_ordersInfoList[index].setRecTime();
                               }
                             }
                             break;

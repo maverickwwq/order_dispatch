@@ -71,6 +71,7 @@
             this.check_btn.TabIndex = 3;
             this.check_btn.Text = "button2";
             this.check_btn.UseVisualStyleBackColor = true;
+            this.check_btn.Click += new System.EventHandler(this.check_btn_Click);
             // 
             // orderInfoForm
             // 

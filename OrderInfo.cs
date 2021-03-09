@@ -14,8 +14,8 @@ namespace zk
         public int orderID;                                           //调度令在数据库的id
         public string orderCode;                                      //文号
         public int orderOpNum;                                        //调度指令数量
-        public Order_Op_Content[] ooc = new Order_Op_Content[100];      //调度指令的数量大概也不会超过100个啦,调度令的内容，只读
-        public Order_Op_Status[] oos = new Order_Op_Status[100];        //调度指令的状态值
+        public Order_Op_Content[] ooc=new Order_Op_Content[100];    //调度指令的数量大概也不会超过100个啦,调度令的内容，只读
+        public Order_Op_Status[] oos=new Order_Op_Status[100];      //调度指令的状态值
 
         public OrderInfo(){
             orderID = 0;
@@ -25,9 +25,20 @@ namespace zk
             oos = new Order_Op_Status[100];
         }
 
+        public OrderInfo(OrderInfo b){
+            orderID=b.orderID;
+            orderCode=b.orderCode;
+            orderOpNum=b.orderOpNum;
+            if(b.ooc!=null){
+              for(int j=0;j<orderOpNum;j++){
+                  ooc[j] = new Order_Op_Content(b.ooc[j]);
+                  oos[j] = new Order_Op_Status(b.oos[j]);
+              }
+            }
+        }
+
         public int CompareTo(object other)
         {
-            //Console.WriteLine("a");
             if (other == null)
                 return 1;
             OrderInfo otherOI = other as OrderInfo;
@@ -39,9 +50,11 @@ namespace zk
         {
             this.orderID = a.orderId;                                           //你好，id给我
             this.orderCode = a.orderCode;                                       //你好，文号给我
-            OrderOp[] oops = new OrderOp[100];                              //
-            a.orderOpList.Sort();             //对调度指令根据序号进行排序
-            oops = a.orderOpList.ToArray();                                     //能超过100个指令吗
+            OrderOp[] oops = new OrderOp[100];
+            if(a.orderOpList!=null){                                 //
+              a.orderOpList.Sort();             //对调度指令根据序号进行排序
+              oops = a.orderOpList.ToArray();                                     //能超过100个指令吗
+            }
             int i = 0;                                                                          //记录调度指令数量
             foreach (OrderOp oop in oops)                                     //初始化ooc及oos内容
             {
@@ -81,6 +94,13 @@ namespace zk
           else
             oos[index].unableReason=reason;
         }
+
+        public bool matchOrderID(OrderInfo t){
+          if(this.orderID == t.orderID)
+            return true;
+          else
+            return false;
+        }
     }
         public class Order_Op_Content    //调度令内容
         {
@@ -106,35 +126,60 @@ namespace zk
             public string sender;      //下发人
             public string sendDateTime;//下发日期时间
 
-            public Order_Op_Content() { }
+            public Order_Op_Content(Order_Op_Content b) {
+              orderCode=b.orderCode;   //调单号
+              orderNum=b.orderNum;    //调单序号
+              transCode=b.transCode;   //发射机代码
+              power=b.power;           //功率
+              startTime=b.startTime;   //开始时间
+              endTime=b.endTime;     //结束时间
+              freq=b.freq;        //频率
+              programName=b.programName; //节目名称
+              channel=b.channel;     //通道
+              antCode=b.antCode;     //天线代码
+              antProg=b.antProg;     //天线程式
+              azimuthM=b.azimuthM;    //天线角度
+              servArea=b.servArea;    //服务区 代码表示 暂时不知道代码所表示的意思
+              operate=b.operate;     //操作  “开” “关”
+              days=b.days;        //周期
+              startDate=b.startDate;   //开始日期
+              endDate=b.endDate;     //结束日期
+              orderType=b.orderType;   //业务
+              orderRmks=b.orderRmks;   //备注
+              sender=b.sender;      //下发人
+              sendDateTime=b.sendDateTime;//下发日期时间
+            }
 
             public Order_Op_Content(OrderOp op){
-              orderCode=op.orderCode;
-              orderNum=op.num;
-              power = op.power;
-              transCode = op.transCode;            //发射机号
-              DateTime dtTmp;
-              dtTmp=DateTime.Parse(op.startTime);
-              startTime = dtTmp.TimeOfDay.ToString();        //开始时间
-              dtTmp=DateTime.Parse(op.endTime);
-              endTime = dtTmp.TimeOfDay.ToString();          //结束时间
-              freq = op.freq;                //频率
-              programName = op.programName;  //节目名称
-              channel = op.channel;          //通道
-              antCode = op.antennaCode;     //天线代码
-              antProg = op.antProg;     //天线程式
-              azimuthM = op.azimuthM;    //天线角度
-              servArea = op.servArea;    //服务区 代码表示 暂时不知道代码所表示的意思
-              operate = op.operate;     //操作  “开” “关”
-              days = op.days;        //周期
-              dtTmp=DateTime.Parse(op.startDate);
-              startDate = dtTmp.ToString("yyyy-MM-dd");   //开始日期
-              dtTmp=DateTime.Parse(op.endDate);
-              endDate = dtTmp.ToString("yyyy-MM-dd");     //结束日期
-              orderType = op.orderType;   //业务
-              orderRmks = op.orderRmks;   //备注
-              sender = op.sender;      //下发人
-              sendDateTime = op.sendDate;//下发日期时间
+                if (op != null)
+                {
+                    orderCode = op.orderCode;
+                    orderNum = op.num;
+                    power = op.power;
+                    transCode = op.transCode;            //发射机号
+                    DateTime dtTmp;
+                    dtTmp = DateTime.Parse(op.startTime);
+                    startTime = dtTmp.TimeOfDay.ToString();        //开始时间
+                    dtTmp = DateTime.Parse(op.endTime);
+                    endTime = dtTmp.TimeOfDay.ToString();          //结束时间
+                    freq = op.freq;                //频率
+                    programName = op.programName;  //节目名称
+                    channel = op.channel;          //通道
+                    antCode = op.antennaCode;     //天线代码
+                    antProg = op.antProg;     //天线程式
+                    azimuthM = op.azimuthM;    //天线角度
+                    servArea = op.servArea;    //服务区 代码表示 暂时不知道代码所表示的意思
+                    operate = op.operate;     //操作  “开” “关”
+                    days = op.days;        //周期
+                    dtTmp = DateTime.Parse(op.startDate);
+                    startDate = dtTmp.ToString("yyyy-MM-dd");   //开始日期
+                    dtTmp = DateTime.Parse(op.endDate);
+                    endDate = dtTmp.ToString("yyyy-MM-dd");     //结束日期
+                    orderType = op.orderType;   //业务
+                    orderRmks = op.orderRmks;   //备注
+                    sender = op.sender;      //下发人
+                    sendDateTime = op.sendDate;//下发日期时间
+                }
             }
         }
 
@@ -151,21 +196,36 @@ namespace zk
             public bool feedback;                   //反馈是否可开
             public string unableReason;             //不可开原因
 
+            public Order_Op_Status(Order_Op_Status b){
+              orderCode=b.orderCode;
+              orderNum=b.orderNum;
+              orderStatus=b.orderStatus;
+              receiver=null;
+              clientReceiveTime=b.clientReceiveTime;
+              confirmTime=b.confirmTime;
+              feedbackUser=b.feedbackUser;
+              feedbackTime=b.feedbackTime;
+              feedback=b.feedback;
+              unableReason=b.unableReason;
+            }
             public Order_Op_Status(OrderOp op){
-              orderCode=op.orderCode;
-              orderNum=op.num;
+                if (op != null)
+                {
+                    orderCode = op.orderCode;
+                    orderNum = op.num;
+                }
             }
 
         }
 
         public enum OrderStatus
         {
-            down_error,                      //未下发
+            down_error,                       //未下发
             sysReceive,                       //系统接收到，服务器尚未确认
-            unconfirmed,                    //值班员未接收
-            confirmed_noFeedback,   //已接受未反馈
-            feedbacked,                           //已反馈
-            unconfirmed_timeout,        //未接收超时
-            confirmed_noFeedback_timeout,//未反馈超时
+            unconfirmed,                      //服务器确认，值班员未接收
+            confirmed_noFeedback,             //值班员已接受未反馈
+            feedbacked,                       //已反馈
+            unconfirmed_timeout,              //未接收超时
+            confirmed_noFeedback_timeout,     //未反馈超时
         }
     }
