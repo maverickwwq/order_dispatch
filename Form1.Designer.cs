@@ -41,6 +41,7 @@
             this.tbd_OrderInfo_dgv.RowTemplate.Height = 23;
             this.tbd_OrderInfo_dgv.Size = new System.Drawing.Size(1024, 679);
             this.tbd_OrderInfo_dgv.TabIndex = 0;
+            this.tbd_OrderInfo_dgv.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.tbd_OrderInfo_dgv_CellContentClick);
             this.tbd_OrderInfo_dgv.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.mouseClickOrder);
             this.tbd_OrderInfo_dgv.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.mouseEnterOrderInfoDGV);
             this.tbd_OrderInfo_dgv.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.mouseLeaveOrderInfoDGV);

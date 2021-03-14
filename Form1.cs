@@ -142,7 +142,7 @@ namespace zk
                   }
                 }*/
                 string tmp = "";
-                for (int i = 0; i < tmpOrInfo.orderOpNum; i++)
+                for (int i = 0; i < tmpOrInfo.orderOpCount; i++)
                 {
                     tmp = tmp + tmpOrInfo.ooc[i].transCode + " ";
                     if (tmpOrInfo.ooc[i].startDate.Equals(tmpOrInfo.ooc[i].endDate))
@@ -257,6 +257,7 @@ namespace zk
 
         private void mouseClickOrder(object sender, DataGridViewCellMouseEventArgs e)
         {
+            Console.WriteLine(e.RowIndex);
             if (e.RowIndex != -1)
             {
                 //MessageBox.Show("cell click"+e.RowIndex);
@@ -277,6 +278,11 @@ namespace zk
         {
             //order_history_query order_query_form = new order_history_query();
             //order_query_form.Show();
+        }
+
+        private void tbd_OrderInfo_dgv_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
 
 

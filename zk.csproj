@@ -54,6 +54,12 @@
     <Compile Include="appLog.cs" />
     <Compile Include="CommUtil.cs" />
     <Compile Include="ConnectState.cs" />
+    <Compile Include="feedbackForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="feedbackForm.Designer.cs">
+      <DependentUpon>feedbackForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,6 +92,9 @@
     <Compile Include="RSData.cs" />
     <Compile Include="User.cs" />
     <Compile Include="voiceReminder.cs" />
+    <EmbeddedResource Include="feedbackForm.resx">
+      <DependentUpon>feedbackForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
       <SubType>Designer</SubType>

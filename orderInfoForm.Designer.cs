@@ -28,21 +28,42 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.orderInfo_dgv = new System.Windows.Forms.DataGridView();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.反馈ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.check_btn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.orderInfo_dgv)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // orderInfo_dgv
             // 
             this.orderInfo_dgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.orderInfo_dgv.ContextMenuStrip = this.contextMenuStrip1;
             this.orderInfo_dgv.Location = new System.Drawing.Point(28, 180);
             this.orderInfo_dgv.Name = "orderInfo_dgv";
             this.orderInfo_dgv.RowTemplate.Height = 27;
             this.orderInfo_dgv.Size = new System.Drawing.Size(1383, 282);
             this.orderInfo_dgv.TabIndex = 0;
+            this.orderInfo_dgv.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.orderOpClick);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.反馈ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(109, 28);
+            this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
+            // 
+            // 反馈ToolStripMenuItem
+            // 
+            this.反馈ToolStripMenuItem.Name = "反馈ToolStripMenuItem";
+            this.反馈ToolStripMenuItem.Size = new System.Drawing.Size(152, 24);
+            this.反馈ToolStripMenuItem.Text = "反馈";
+            this.反馈ToolStripMenuItem.Click += new System.EventHandler(this.反馈ToolStripMenuItem_Click);
             // 
             // button1
             // 
@@ -86,6 +107,7 @@
             this.Text = "orderInfoForm";
             this.Load += new System.EventHandler(this.orderInfoForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.orderInfo_dgv)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -97,5 +119,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button check_btn;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 反馈ToolStripMenuItem;
     }
 }

@@ -13,14 +13,14 @@ namespace zk
     {
         public int orderID;                                           //调度令在数据库的id
         public string orderCode;                                      //文号
-        public int orderOpNum;                                        //调度指令数量
+        public int orderOpCount;                                        //调度指令数量
         public Order_Op_Content[] ooc=new Order_Op_Content[100];    //调度指令的数量大概也不会超过100个啦,调度令的内容，只读
         public Order_Op_Status[] oos=new Order_Op_Status[100];      //调度指令的状态值
 
         public OrderInfo(){
-            orderID = 0;
+            orderID = -1;
             orderCode = null;
-            orderOpNum = 0;
+            orderOpCount = -1;
             ooc = new Order_Op_Content[100];
             oos = new Order_Op_Status[100];
         }
@@ -28,9 +28,9 @@ namespace zk
         public OrderInfo(OrderInfo b){
             orderID=b.orderID;
             orderCode=b.orderCode;
-            orderOpNum=b.orderOpNum;
+            orderOpCount=b.orderOpCount;
             if(b.ooc!=null){
-              for(int j=0;j<orderOpNum;j++){
+              for(int j=0;j<orderOpCount;j++){
                   ooc[j] = new Order_Op_Content(b.ooc[j]);
                   oos[j] = new Order_Op_Status(b.oos[j]);
               }
@@ -48,38 +48,31 @@ namespace zk
 
         public OrderInfo(Order a)      //构造函数，给orderInfo赋值
         {
-            this.orderID = a.orderId;                                           //你好，id给我
-            this.orderCode = a.orderCode;                                       //你好，文号给我
-            OrderOp[] oops = new OrderOp[100];
-            if(a.orderOpList!=null){                                 //
-              a.orderOpList.Sort();             //对调度指令根据序号进行排序
-              oops = a.orderOpList.ToArray();                                     //能超过100个指令吗
+            this.orderID = a.orderId;                              //你好，id给我
+            this.orderCode = a.orderCode;                          //你好，文号给我
+            if(a.orderOpList!=null){
+                this.orderOpCount=a.orderOpList.Count;
+                a.orderOpList.Sort();                                //对调度指令根据序号进行排序
+                for(int j=0;j<a.orderOpList.Count;j++){
+                    this.ooc[j]=new Order_Op_Content(a.orderOpList[j]);
+                    this.oos[j]=new Order_Op_Status(a.orderOpList[j]);
+                }
             }
-            int i = 0;                                                                          //记录调度指令数量
-            foreach (OrderOp oop in oops)                                     //初始化ooc及oos内容
-            {
-                //this.oos[i].orderCode = oop.orderCode;            //文号
-                //this.oos[i].orderNum = oop.num;                   //序号
-                this.ooc[i] = new Order_Op_Content(oop);          //
-                this.oos[i] = new Order_Op_Status(oop);           //
-                i++;
-            }
-            this.orderOpNum = i;
         }
 
         public void setOdStatus(OrderStatus odStatus)
         {
-          for(int j=0;j<orderOpNum;j++)
+          for(int j=0;j<orderOpCount;j++)
             oos[j].orderStatus=odStatus;
         }
 
         public void setRecTime(){
-          for(int j=0;j<orderOpNum;j++)
+          for(int j=0;j<orderOpCount;j++)
             oos[j].clientReceiveTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         public void setConfTime(){
-          for(int j=0;j<orderOpNum;j++)
+          for(int j=0;j<orderOpCount;j++)
             oos[j].confirmTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
@@ -106,6 +99,7 @@ namespace zk
         {
             public string orderCode;   //调单号
             public int orderNum;    //调单序号
+            public int orderOpID;                   //
             public string transCode;   //发射机代码
             public int power;           //功率
             public string startTime;   //开始时间
@@ -129,6 +123,7 @@ namespace zk
             public Order_Op_Content(Order_Op_Content b) {
               orderCode=b.orderCode;   //调单号
               orderNum=b.orderNum;    //调单序号
+              orderOpID = b.orderOpID;//调度指令在数据库中的主键
               transCode=b.transCode;   //发射机代码
               power=b.power;           //功率
               startTime=b.startTime;   //开始时间
@@ -155,13 +150,14 @@ namespace zk
                 {
                     orderCode = op.orderCode;
                     orderNum = op.num;
+                    orderOpID = op.orderNumId;
                     power = op.power;
                     transCode = op.transCode;            //发射机号
                     DateTime dtTmp;
                     dtTmp = DateTime.Parse(op.startTime);
-                    startTime = dtTmp.TimeOfDay.ToString();        //开始时间
+                    startTime = dtTmp.Hour.ToString().PadLeft(2,'0')+":"+dtTmp.Minute.ToString().PadLeft(2,'0');        //开始时间
                     dtTmp = DateTime.Parse(op.endTime);
-                    endTime = dtTmp.TimeOfDay.ToString();          //结束时间
+                    endTime = dtTmp.Hour.ToString().PadLeft(2,'0')+":"+dtTmp.Minute.ToString().PadLeft(2,'0');          //结束时间
                     freq = op.freq;                //频率
                     programName = op.programName;  //节目名称
                     channel = op.channel;          //通道
@@ -190,8 +186,8 @@ namespace zk
             public OrderStatus orderStatus;         //orderOp当前在系统中的状态
             public User receiver;                   //接收人
             public string clientReceiveTime;        //客户端接收时间
-            public string confirmTime;             //接收人点击确认接收的时间
-            public string feedbackUser;            //反馈人
+            public string confirmTime;              //接收人点击确认接收的时间
+            public string feedbackUser;             //反馈人
             public string feedbackTime;             //反馈时间
             public bool feedback;                   //反馈是否可开
             public string unableReason;             //不可开原因
@@ -200,7 +196,7 @@ namespace zk
               orderCode=b.orderCode;
               orderNum=b.orderNum;
               orderStatus=b.orderStatus;
-              receiver=null;
+              receiver=b.receiver;
               clientReceiveTime=b.clientReceiveTime;
               confirmTime=b.confirmTime;
               feedbackUser=b.feedbackUser;
@@ -208,9 +204,9 @@ namespace zk
               feedback=b.feedback;
               unableReason=b.unableReason;
             }
+
             public Order_Op_Status(OrderOp op){
-                if (op != null)
-                {
+                if (op != null){
                     orderCode = op.orderCode;
                     orderNum = op.num;
                 }
@@ -223,7 +219,7 @@ namespace zk
             down_error,                       //未下发
             sysReceive,                       //系统接收到，服务器尚未确认
             unconfirmed,                      //服务器确认，值班员未接收
-            confirmed_noFeedback,             //值班员已接受未反馈
+            confirmed_noFeedback,             //值班员已接收未反馈
             feedbacked,                       //已反馈
             unconfirmed_timeout,              //未接收超时
             confirmed_noFeedback_timeout,     //未反馈超时

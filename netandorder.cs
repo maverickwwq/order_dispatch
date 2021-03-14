@@ -206,8 +206,18 @@ namespace zk
                             break;
 
                         case "CONFIRM_ORDER_REPLY":
-
-
+                            Console.WriteLine("confirm order reply");
+                            tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
+                            index=-1;
+                            lock(GlobalVarForApp.tbh_ordersInfoList){
+                              index=GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
+                              if(index != -1){
+                                    Console.WriteLine("find order");
+                                    GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.confirmed_noFeedback);
+                                    GlobalVarForApp.tbh_ordersInfoList[index].setConfTime();
+                              }
+                            }
+                            break;
                         default: /* 可选的 */
                             break;
 

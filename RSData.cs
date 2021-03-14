@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DispatchServer.BaseClass;
+using zk;
 
 namespace DispatchServer
 {
@@ -39,6 +40,65 @@ namespace DispatchServer
 
         public RSData()
         {
+        }
+
+        public void fill_feedback_order(OrderInfo toSend)
+        {
+            CommType = "FEEDBACK_ORDER";
+            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            CommDept = GlobalVarForApp.client_type; ;
+            Order a = new Order();
+            a.orderCode = toSend.orderCode;
+            a.orderId = toSend.orderID;
+            a.orderRecordList = new List<OrderRecord>();
+            for (int j = 0; j < toSend.orderOpCount; j++)
+            {
+                OrderRecord b = new OrderRecord();
+                b.orderId = toSend.orderID;
+                b.orderNumId = toSend.ooc[j].orderOpID;
+                if (toSend.oos[j].feedback == true)
+                {
+                    b.broadcastTime = toSend.oos[j].feedbackTime;
+                    b.inexeReason = null;
+                }
+                else
+                {
+                    toSend.oos[j].feedback = false;
+                    b.broadcastTime = null;
+                    b.inexeReason = toSend.oos[j].unableReason;
+                }
+                a.orderRecordList.Add(b);
+            }
+            order = a;
+        }
+
+        public void fill_receive_order(OrderInfo toSend)
+        {
+            CommType = "RECEIVE_ORDER";
+            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            CommDept = GlobalVarForApp.client_type;
+            Order a = new Order();
+            a.orderCode = toSend.orderCode;
+            a.orderId = toSend.orderID;
+            a.orderRecordList = new List<OrderRecord>();
+            for (int j = 0; j < toSend.orderOpCount;j++ )
+            {
+                OrderRecord b = new OrderRecord();
+                b.orderNumId = toSend.ooc[j].orderOpID;
+                a.orderRecordList.Add(b);
+            }
+        }
+
+        public void fill_confirm_order(OrderInfo toSend)
+        {
+            CommType = "CONFIRM_ORDER";
+            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            CommDept = GlobalVarForApp.client_type;
+            Order a = new Order();
+            a.orderCode = toSend.orderCode;
+            a.orderId = toSend.orderID;
+            OrderRecord b = new OrderRecord();
+
         }
     }
 }
