@@ -12,122 +12,7 @@ namespace zk
 {
     public class netandorder
     {
-        public static void receive_order_send(Order order)          //接收order odid参数，发送 调度令接收确认
-        {
-            RSData tmp = new RSData();
-            tmp.CommType = "RECEIVE_ORDER";
-            tmp.CommTime = System.DateTime.Now.ToString();
-            tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
-            tmp.currentUser = GlobalVarForApp.currentUserStr;
-            //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
-            //network.sendRSDataProc();
-            network.sendData(tmp);
-        }
-
-        public static void feedback_order_send(List<OrderRecord> orderRecordList)  //接收orderRecordList参数，发送 调度令反馈
-        {
-            RSData tmp = new RSData();
-            tmp.CommType = "FEEDBACK_ORDER";
-            tmp.CommTime = System.DateTime.Now.ToString();
-            tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
-            tmp.currentUser = GlobalVarForApp.currentUserStr;
-            //tmp.orderRecordList = orderRecordList;
-            //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
-            //network.sendRSDataProc();
-            network.sendData(tmp);
-        }
-
-        public static void query_orders_request_send(Query query)       //接收query参数，发送调度令批量查询
-        {
-            RSData tmp = new RSData();
-            tmp.CommType = "QUERY_ORDERS_REQUEST";
-            tmp.CommTime = System.DateTime.Now.ToString();
-            tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
-            tmp.currentUser = GlobalVarForApp.currentUserStr;
-            tmp.query = query;
-            //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
-            //network.sendData();
-            network.sendData(tmp);
-        }
-
-        public static void query_order_request_send(Query query)        //接收query参数，发送调度令查询
-        {
-            RSData tmp = new RSData();
-            tmp.CommType = "QUERY_ORDER_REQUEST";
-            tmp.CommTime = System.DateTime.Now.ToString();
-            tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
-            tmp.currentUser = GlobalVarForApp.currentUserStr;
-            tmp.query = query;
-            //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
-            //network.sendRSDataProc();
-            network.sendData(tmp);
-        }
-
-        public static void askForAllUnfinishedOrder_send()           //ask for orders unfinished since 24hours ago
-        {
-            Query askForUnfinishedOrder = new Query();
-            askForUnfinishedOrder.pageIndex = 1;            //---------------------------------------------------------------------------
-            askForUnfinishedOrder.pageSize = 100;           //每页记录数
-            askForUnfinishedOrder.queryOrderStatus = new string[4] { "待下发", "待接收", "待反馈", "" };
-            askForUnfinishedOrder.queryStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            long today = DateTime.Now.Ticks;
-            askForUnfinishedOrder.queryEndTime = new DateTime(today - 864000000000).ToString("yyyy-MM-dd HH:mm:ss");     //24hours ago
-            netandorder.query_orders_request_send(askForUnfinishedOrder);
-        }
-
-        //
-        //-----------------------------------------------------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------------------------------------------------
-        //
-        //
-        /*
-        public static OrderInfo down_order_receive(RSData tmp, OrderInfo oitmp)         //接收DOWN_ORDER，将数据存入全局变量
-        {
-            oitmp.orderInfo = tmp.order;
-            oitmp.orderInstructionList= tmp.orderOpList;
-            oitmp.orderRecordList = tmp.orderRecordList;
-            return oitmp;
-        }
-
-        public static OrderInfo down_order_reply_receive(RSData tmp,OrderInfo oitmp)    //客户端接收通知
-        {
-            oitmp.orderInfo = tmp.order;
-            oitmp.orderStatus =OrderStatus.unconfirmed;     //
-            return oitmp;
-        }
-
-        public static OrderInfo receive_order_reply_receive(RSData tmp,OrderInfo oitmp) //机房值班员确认接收通知
-        {
-            oitmp.orderInfo = tmp.order;
-            oitmp.orderStatus = OrderStatus.confirmed_noFeedback;        //
-            return oitmp;
-        }
-
-        public static OrderInfo feedback_order_reply_receive(RSData tmp,OrderInfo oitmp)
-        {
-            oitmp.orderInfo = tmp.order;
-            oitmp.orderStatus = OrderStatus.feedback;
-            oitmp.orderRecordList = tmp.orderRecordList;
-            return oitmp;
-        }
-
-        public static List<OrderAndOp> query_orders_reply_receive(RSData rec)   //批量获取调度令信息
-        {
-            List<OrderAndOp> tmpOaoList = new List<OrderAndOp>();
-            tmpOaoList = rec.orderAndOpList;
-            return tmpOaoList;
-        }
-
-
-        public static OrderInfo query_oder_reply_receive(RSData tmp,OrderInfo oitmp)
-        {
-            oitmp.orderInfo = tmp.order;
-            oitmp.orderInstructionList = tmp.orderOpList;
-            return oitmp;
-        }
-        */
-
-        //对接收到的数据进行处理
+        //对接收到的RSData数据进行处理
         public static void HandleTheMessageReceive()
         {
 #if _debug_
@@ -159,15 +44,24 @@ namespace zk
                             //默认是新下发的调度令
                             tmpOI.setRecTime();
                             tmpOI.setOdStatus(OrderStatus.sysReceive);
-                            lock(GlobalVarForApp.tbh_ordersInfoList){
-                              GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
-                              GlobalVarForApp.tbh_ordersInfoList.Sort();        //对tbh进行排序
+                            index=-1;
+                            index=GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
+                            if(index==-1){  //tbh里没找到相同orderID的
+                                lock(GlobalVarForApp.tbh_ordersInfoList){
+                                    GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
+                                    GlobalVarForApp.tbh_ordersInfoList.Sort();        //对tbh按orderID升序进行排序
+                                }
+                                RSData sendTmp = new RSData();
+                                sendTmp.fill_receive_order(tmpOI);
+                                //int cycle = 0;
+                                //while (cycle < 100000) { cycle++; }
+                                network.sendData(sendTmp);
                             }
-
-                            RSData sendTmp = new RSData();
-                            sendTmp.fill_receive_order(tmpOI);
-                            network.sendData(sendTmp);
-                            //GlobalVarForApp.f.UIrefresh(null,null);
+                            else{
+                                //下发了相同的调度令啦 出错了
+                                //界面提示待完成
+                                Console.WriteLine("下发了相同的调度令啦 出错了");
+                            }
                             break;
 
                         case "RECEIVE_ORDER_REPLY":              //
@@ -179,7 +73,6 @@ namespace zk
                               if(index != -1){
                                     Console.WriteLine("find order");
                                     GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.unconfirmed);
-                                    //GlobalVarForApp.tbh_ordersInfoList[index].setRecTime();
                               }
                               else{     //收到receive order reply,却没有找到该调度令,那就是出错了
                                   Console.WriteLine("收到receive order reply，内存里找不到该调度令的相关信息");
@@ -243,6 +136,42 @@ namespace zk
             }
         }
 
+        public static void query_orders_request_send(Query query)       //接收query参数，发送调度令批量查询
+        {
+            RSData tmp = new RSData();
+            tmp.CommType = "QUERY_ORDERS_REQUEST";
+            tmp.CommTime = System.DateTime.Now.ToString();
+            tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
+            tmp.currentUser = GlobalVarForApp.currentUserStr;
+            tmp.query = query;
+            //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
+            //network.sendData();
+            network.sendData(tmp);
+        }
 
+        public static void query_order_request_send(Query query)        //接收query参数，发送调度令查询
+        {
+            RSData tmp = new RSData();
+            tmp.CommType = "QUERY_ORDER_REQUEST";
+            tmp.CommTime = System.DateTime.Now.ToString();
+            tmp.CommDept = GlobalVarForApp.client_type; //机房的代码
+            tmp.currentUser = GlobalVarForApp.currentUserStr;
+            tmp.query = query;
+            //GlobalVarForApp.sendMessageQueue.Enqueue(tmp);
+            //network.sendRSDataProc();
+            network.sendData(tmp);
+        }
+
+        public static void askForAllUnfinishedOrder_send()           //ask for orders unfinished since 24hours ago
+        {
+            Query askForUnfinishedOrder = new Query();
+            askForUnfinishedOrder.pageIndex = 1;            //---------------------------------------------------------------------------
+            askForUnfinishedOrder.pageSize = 100;           //每页记录数
+            askForUnfinishedOrder.queryOrderStatus = new string[4] { "待下发", "待接收", "待反馈", "" };
+            askForUnfinishedOrder.queryStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            long today = DateTime.Now.Ticks;
+            askForUnfinishedOrder.queryEndTime = new DateTime(today - 864000000000).ToString("yyyy-MM-dd HH:mm:ss");     //24hours ago
+            netandorder.query_orders_request_send(askForUnfinishedOrder);
+        }
     }
 }

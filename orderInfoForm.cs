@@ -16,8 +16,8 @@ namespace zk
     public partial class orderInfoForm : Form
     {
         public OrderInfo displayOrderInfo;    //tbh_ordersInfoList[index]的一个copy，存放选择的调度令信息的详细信息
-        public int OrderIndex = -1;
-        public int orderOpIndex = 0;             //默认是第一个调度指令,从0开始
+        public int OrderIndex = -1;                 //当前orderInfo在tbh里的序号
+        public int orderOpIndex = 0;             //当前datagridview里选择的orderOP序号，默认是第一个调度指令,从0开始
         public orderInfoForm()
         {
             InitializeComponent();
@@ -76,8 +76,7 @@ namespace zk
             orderInfo_dgv.Columns[16].Name = "备注";
 
             label1.Text = displayOrderInfo.orderCode;
-            for (int j = 0; j < displayOrderInfo.orderOpCount; j++)
-            {
+            for (int j = 0; j < displayOrderInfo.orderOpCount; j++){
                 orderInfo_dgv.Rows.Add(1);
                 orderInfo_dgv.Rows[j].Cells[0].Value = displayOrderInfo.ooc[j].orderNum;
                 orderInfo_dgv.Rows[j].Cells[1].Value = displayOrderInfo.ooc[j].transCode;
@@ -98,7 +97,7 @@ namespace zk
                 orderInfo_dgv.Rows[j].Cells[16].Value = displayOrderInfo.ooc[j].orderRmks;
             }
             switch (displayOrderInfo.oos[0].orderStatus){
-                case OrderStatus.sysReceive:
+                case OrderStatus.sysReceive:            //系统已接收，但尚未收到服务器的接收确认
                     check_btn.Text = "接收";
                     check_btn.Enabled = false;
                     break;
@@ -108,12 +107,12 @@ namespace zk
                     check_btn.Enabled = true;
                     break;
 
-                case OrderStatus.confirmed_noFeedback:
+                case OrderStatus.confirmed_noFeedback:      //已接收待反馈
                     check_btn.Text = "反馈";
                     check_btn.Enabled = true;
                     break;
 
-                case OrderStatus.feedbacked:
+                case OrderStatus.feedbacked:                        //已经反馈过至少一次了
                     check_btn.Text = "已反馈";
                     check_btn.Enabled = false;
                     break;
@@ -136,6 +135,7 @@ namespace zk
                         check_btn.Text = "反馈";
                     }
                 }
+                displayOrderInfo.setOdStatus(OrderStatus.confirmed_noFeedback);
                 this.Cursor = Cursors.Default;
             }
             else if (check_btn.Text == "反馈"){
@@ -147,10 +147,18 @@ namespace zk
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
+            if(displayOrderInfo.oos[0].orderStatus==OrderStatus.confirmed_noFeedback || displayOrderInfo.oos[0].orderStatus == OrderStatus.feedbacked){
+                e.Cancel=false;
+            }
+            else{
+                e.Cancel=true;
+            }
         }
 
         private void 反馈ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (orderOpIndex == -1)
+                return;
             feedbackForm fb_form = new feedbackForm(displayOrderInfo, orderOpIndex);
             Console.WriteLine("oopindex:"+orderOpIndex);
             fb_form.ShowDialog();
@@ -163,11 +171,32 @@ namespace zk
             fb_form.Close();
         }
 
-        private void orderOpClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void orderOpDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            orderOpIndex=e.RowIndex;
-            Console.WriteLine(e.RowIndex.ToString());
+            if (e.RowIndex == -1)
+                return;
+            orderOpIndex = e.RowIndex;
+            if (displayOrderInfo.oos[orderOpIndex].orderStatus == OrderStatus.confirmed_noFeedback || displayOrderInfo.oos[orderOpIndex].orderStatus == OrderStatus.feedbacked)
+            {
+                feedbackForm fb_form = new feedbackForm(displayOrderInfo, orderOpIndex);
+                Console.WriteLine("oopindex:" + orderOpIndex);
+                fb_form.ShowDialog();
+                if (fb_form.dialogResult == true)
+                {
+                    Console.WriteLine("dialog result true");
+                    displayOrderInfo.oos[orderOpIndex].feedback = fb_form.orderInfo.oos[orderOpIndex].feedback;
+                    displayOrderInfo.oos[orderOpIndex].broadcastTime = fb_form.orderInfo.oos[orderOpIndex].broadcastTime;
+                    displayOrderInfo.oos[orderOpIndex].unableReason = fb_form.orderInfo.oos[orderOpIndex].unableReason;
+                }
+                fb_form.Close();
+            }
         }
 
+        private void orderOpClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex == -1)
+                return;
+            orderOpIndex = e.RowIndex;
+        }
     }
 }

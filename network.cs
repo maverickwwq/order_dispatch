@@ -165,7 +165,9 @@ namespace zk
                     refreshUI=true;
                     try
                     {
-                        GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));       //获取有效数据
+                        lock(GlobalVarForApp.receiveMessageQueue){
+                            GlobalVarForApp.receiveMessageQueue.Enqueue(JsonConvert.DeserializeObject<RSData>(message.Substring(0, a)));
+                        }       //获取有效数据
                         message = message.Substring(a + 7);
                     }
                     catch (Exception e){

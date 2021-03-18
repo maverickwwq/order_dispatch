@@ -49,6 +49,7 @@
             this.orderInfo_dgv.Size = new System.Drawing.Size(1383, 282);
             this.orderInfo_dgv.TabIndex = 0;
             this.orderInfo_dgv.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.orderOpClick);
+            this.orderInfo_dgv.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.orderOpDoubleClick);
             // 
             // contextMenuStrip1
             // 
@@ -106,7 +107,7 @@
             this.Name = "orderInfoForm";
             this.Text = "orderInfoForm";
             this.Load += new System.EventHandler(this.orderInfoForm_Load);
-            this.DoubleClick += new System.EventHandler(this.反馈ToolStripMenuItem_Click);
+            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.反馈ToolStripMenuItem_Click);
             ((System.ComponentModel.ISupportInitialize)(this.orderInfo_dgv)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);

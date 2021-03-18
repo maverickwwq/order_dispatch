@@ -57,7 +57,7 @@ namespace zk
         private static bool program_initial()       //系统初始化   成功返回true 失败false
         {
             //  读配置文件
-            
+
             GlobalVarForApp.currentUserStr= new User();
             GlobalVarForApp.currentUserStr.userName = "特朗普";
             var setting = ConfigurationManager.AppSettings;
