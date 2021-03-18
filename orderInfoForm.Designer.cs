@@ -61,7 +61,7 @@
             // 反馈ToolStripMenuItem
             // 
             this.反馈ToolStripMenuItem.Name = "反馈ToolStripMenuItem";
-            this.反馈ToolStripMenuItem.Size = new System.Drawing.Size(152, 24);
+            this.反馈ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.反馈ToolStripMenuItem.Text = "反馈";
             this.反馈ToolStripMenuItem.Click += new System.EventHandler(this.反馈ToolStripMenuItem_Click);
             // 
@@ -106,6 +106,7 @@
             this.Name = "orderInfoForm";
             this.Text = "orderInfoForm";
             this.Load += new System.EventHandler(this.orderInfoForm_Load);
+            this.DoubleClick += new System.EventHandler(this.反馈ToolStripMenuItem_Click);
             ((System.ComponentModel.ISupportInitialize)(this.orderInfo_dgv)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);

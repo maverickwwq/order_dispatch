@@ -57,7 +57,7 @@ namespace DispatchServer
                 b.orderNumId = toSend.ooc[j].orderOpID;
                 a.orderRecordList.Add(b);
             }
-            order = a;
+            this.order = a;
         }
 
         public void fill_confirm_order(OrderInfo toSend)
@@ -76,7 +76,7 @@ namespace DispatchServer
                 b.deptConfirmPerson = GlobalVarForApp.currentUserStr.userName;
                 a.orderRecordList.Add(b);
             }
-            order = a;
+            this.order = a;
         }
 
         public void fill_feedback_order(OrderInfo toSend)
