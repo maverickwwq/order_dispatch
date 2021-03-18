@@ -77,7 +77,8 @@ namespace zk
         }
 
         public void setFbTime(int index){
-          oos[index].feedbackTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+          for(int j=0;j<orderOpCount;j++)
+            oos[index].feedbackTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         public void setFbInfo(int index,bool fb,string reason){
@@ -190,6 +191,7 @@ namespace zk
             public string feedbackUser;             //反馈人
             public string feedbackTime;             //反馈时间
             public bool feedback;                   //反馈是否可开
+            public string broadcastTime;            //开启时间
             public string unableReason;             //不可开原因
 
             public Order_Op_Status(Order_Op_Status b){
@@ -202,6 +204,7 @@ namespace zk
               feedbackUser=b.feedbackUser;
               feedbackTime=b.feedbackTime;
               feedback=b.feedback;
+              broadcastTime=b.broadcastTime;
               unableReason=b.unableReason;
             }
 

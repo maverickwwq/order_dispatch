@@ -17,7 +17,7 @@ namespace zk
     {
         public OrderInfo displayOrderInfo;    //tbh_ordersInfoList[index]的一个copy，存放选择的调度令信息的详细信息
         public int OrderIndex = -1;
-        public int rowSelected=-1;
+        public int orderOpIndex = 0;             //默认是第一个调度指令,从0开始
         public orderInfoForm()
         {
             InitializeComponent();
@@ -36,7 +36,6 @@ namespace zk
         public orderInfoForm(int index)
         {
             InitializeComponent();
-
             OrderIndex = index;
             lock(GlobalVarForApp.tbh_ordersInfoList){
               displayOrderInfo=new OrderInfo(GlobalVarForApp.tbh_ordersInfoList[OrderIndex]);
@@ -115,6 +114,8 @@ namespace zk
                     break;
 
                 case OrderStatus.feedbacked:
+                    check_btn.Text = "已反馈";
+                    check_btn.Enabled = false;
                     break;
             }
         }
@@ -122,23 +123,11 @@ namespace zk
         private void check_btn_Click(object sender, EventArgs e)
         {
             if (check_btn.Text == "接收"){
-                RSData sendTmp=new RSData();              //send "CONFIRM_ORDER"
-                sendTmp.CommType="CONFIRM_ORDER";
-                sendTmp.CommTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                sendTmp.CommDept=GlobalVarForApp.client_type;
-                sendTmp.order=new Order();
-                sendTmp.order.orderId = displayOrderInfo.orderID;
-                sendTmp.order.orderCode=displayOrderInfo.orderCode;
-                sendTmp.order.orderRecordList = new List<OrderRecord>();
-                for(int j=0;j<displayOrderInfo.orderOpCount;j++){
-                  OrderRecord orTmp = new OrderRecord();
-                  orTmp.orderNumId = displayOrderInfo.ooc[j].orderOpID;
-                  orTmp.deptConfirmPerson = "特朗普";
-                  sendTmp.order.orderRecordList.Add(orTmp);
-                }
+                RSData sendTmp=new RSData();
+                sendTmp.fill_confirm_order(displayOrderInfo);
                 network.sendData(sendTmp);
                 this.Cursor = Cursors.AppStarting;
-                Thread.Sleep(1000);
+                Thread.Sleep(1000);     //wait for confirm order reply  about 1s
                 lock (GlobalVarForApp.tbh_ordersInfoList)
                 {
                     OrderIndex = GlobalVarForApp.tbh_ordersInfoList.FindIndex(displayOrderInfo.matchOrderID);
@@ -150,7 +139,9 @@ namespace zk
                 this.Cursor = Cursors.Default;
             }
             else if (check_btn.Text == "反馈"){
-                MessageBox.Show(OrderIndex.ToString());
+                RSData rsd = new RSData();
+                rsd.fill_feedback_order(displayOrderInfo);
+                network.sendData(rsd);
             }
         }
 
@@ -160,13 +151,21 @@ namespace zk
 
         private void 反馈ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            feedbackForm fb_form = new feedbackForm(displayOrderInfo,rowSelected);
-            fb_form.Show();
+            feedbackForm fb_form = new feedbackForm(displayOrderInfo, orderOpIndex);
+            Console.WriteLine("oopindex:"+orderOpIndex);
+            fb_form.ShowDialog();
+            if(fb_form.dialogResult==true){
+                Console.WriteLine("dialog result true");
+                displayOrderInfo.oos[orderOpIndex].feedback = fb_form.orderInfo.oos[orderOpIndex].feedback;
+                displayOrderInfo.oos[orderOpIndex].broadcastTime = fb_form.orderInfo.oos[orderOpIndex].broadcastTime;
+                displayOrderInfo.oos[orderOpIndex].unableReason = fb_form.orderInfo.oos[orderOpIndex].unableReason;
+            }
+            fb_form.Close();
         }
 
         private void orderOpClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            rowSelected=e.RowIndex;
+            orderOpIndex=e.RowIndex;
             Console.WriteLine(e.RowIndex.ToString());
         }
     }

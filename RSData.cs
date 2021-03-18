@@ -21,7 +21,7 @@ namespace DispatchServer
         //设置相关的操作变量
         public User user = null;//用户(单个)
         public List<User> userList = null;//用户(多个)
-        public string infoReturn=null;//操作信息返回
+        public string infoReturn = null;//操作信息返回
 
         //调令相关的操作变量
         public Order order = null;//调度令(单个)
@@ -42,6 +42,43 @@ namespace DispatchServer
         {
         }
 
+        public void fill_receive_order(OrderInfo toSend)
+        {
+            CommType = "RECEIVE_ORDER";
+            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            CommDept = GlobalVarForApp.client_type;
+            Order a = new Order();
+            a.orderCode = toSend.orderCode;
+            a.orderId = toSend.orderID;
+            a.orderRecordList = new List<OrderRecord>();
+            for (int j = 0; j < toSend.orderOpCount; j++)
+            {
+                OrderRecord b = new OrderRecord();
+                b.orderNumId = toSend.ooc[j].orderOpID;
+                a.orderRecordList.Add(b);
+            }
+            order = a;
+        }
+
+        public void fill_confirm_order(OrderInfo toSend)
+        {
+            CommType = "CONFIRM_ORDER";
+            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            CommDept = GlobalVarForApp.client_type;
+            Order a = new Order();
+            a.orderCode = toSend.orderCode;
+            a.orderId = toSend.orderID;
+            a.orderRecordList = new List<OrderRecord>();
+            for (int j = 0; j < toSend.orderOpCount; j++)
+            {
+                OrderRecord b = new OrderRecord();
+                b.orderNumId = toSend.ooc[j].orderOpID;
+                b.deptConfirmPerson = GlobalVarForApp.currentUserStr.userName;
+                a.orderRecordList.Add(b);
+            }
+            order = a;
+        }
+
         public void fill_feedback_order(OrderInfo toSend)
         {
             CommType = "FEEDBACK_ORDER";
@@ -56,49 +93,22 @@ namespace DispatchServer
                 OrderRecord b = new OrderRecord();
                 b.orderId = toSend.orderID;
                 b.orderNumId = toSend.ooc[j].orderOpID;
+                b.deptConfirmPerson=GlobalVarForApp.currentUserStr.userName;
                 if (toSend.oos[j].feedback == true)
                 {
-                    b.broadcastTime = toSend.oos[j].feedbackTime;
+                    b.broadcastTime = toSend.oos[j].broadcastTime;
+
                     b.inexeReason = null;
                 }
                 else
                 {
-                    toSend.oos[j].feedback = false;
                     b.broadcastTime = null;
                     b.inexeReason = toSend.oos[j].unableReason;
                 }
                 a.orderRecordList.Add(b);
             }
-            order = a;
-        }
-
-        public void fill_receive_order(OrderInfo toSend)
-        {
-            CommType = "RECEIVE_ORDER";
-            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            CommDept = GlobalVarForApp.client_type;
-            Order a = new Order();
-            a.orderCode = toSend.orderCode;
-            a.orderId = toSend.orderID;
-            a.orderRecordList = new List<OrderRecord>();
-            for (int j = 0; j < toSend.orderOpCount;j++ )
-            {
-                OrderRecord b = new OrderRecord();
-                b.orderNumId = toSend.ooc[j].orderOpID;
-                a.orderRecordList.Add(b);
-            }
-        }
-
-        public void fill_confirm_order(OrderInfo toSend)
-        {
-            CommType = "CONFIRM_ORDER";
-            CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            CommDept = GlobalVarForApp.client_type;
-            Order a = new Order();
-            a.orderCode = toSend.orderCode;
-            a.orderId = toSend.orderID;
-            OrderRecord b = new OrderRecord();
-
+            this.order= a;
         }
     }
+
 }

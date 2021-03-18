@@ -15,6 +15,7 @@ namespace zk
     {
         public OrderInfo orderInfo;
         public int index;
+        public bool dialogResult;
 
         public feedbackForm(OrderInfo a,int b)
         {
@@ -32,59 +33,38 @@ namespace zk
 
         private void confirm_btn_Click(object sender, EventArgs e)
         {
-            RSData rsdTmp = new RSData();
-            rsdTmp.CommType = "FEEDBACK_ORDER";
-            rsdTmp.CommTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            rsdTmp.CommDept = GlobalVarForApp.client_type;
-            Order orTmp = new Order();
-            orTmp.orderCode = orderInfo.orderCode;
-            orTmp.orderId = orderInfo.orderID;
-            orTmp.orderRecordList=new List<OrderRecord>();
-            for(int j=0;j<orderInfo.orderOpCount;j++){
-                OrderRecord b=new OrderRecord();
-                b.orderId=orderInfo.orderID;
-                b.orderNumId=orderInfo.ooc[j].orderOpID;
-                if(operate_suc_chk.Checked==true){
-                    orderInfo.oos[j].feedback = true;
-                    b.broadcastTime=dateTimePicker1.Value.ToString("yyyy-MM-dd HH:mm:ss");
-                    b.inexeReason=null;
-                }
-                else{
-                    orderInfo.oos[j].feedback = false;
-                    b.broadcastTime=null;
-                    b.inexeReason=reason_content.Text;
-                }
-                orTmp.orderRecordList.Add(b);
+            dialogResult = true;
+            if (operate_suc_chk.Checked == true){
+                orderInfo.oos[index].feedback = true;
+                orderInfo.oos[index].broadcastTime = dateTimePicker1.Value.ToString("yyyy-MM-dd HH:mm:ss");
+                orderInfo.oos[index].unableReason = null;
             }
-            rsdTmp.order=orTmp;
-            network.sendData(rsdTmp);
+            else{
+                orderInfo.oos[index].feedback = false;
+                orderInfo.oos[index].broadcastTime =null;
+                orderInfo.oos[index].unableReason = reason_content.Text.Trim();
+            }
+            this.Close();
         }
 
         private void cancel_btn_Click(object sender, EventArgs e)
         {
+            dialogResult = false;
             this.Close();
         }
 
         private void operate_suc_CheckedChanged(object sender, EventArgs e)
         {
-            //operate_fail_chk.Checked = false;
-            //operate_suc_chk.Checked = true;
-            //orderInfo.oos[index].feedback = true;
-            //orderInfo.oos[index].feedbackTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         private void operate_fail_CheckedChanged(object sender, EventArgs e)
         {
-            //operate_suc_chk.Checked = false;
-            //operate_fail_chk.Checked = true;
         }
 
         private void operate_suc_chk_Click(object sender, EventArgs e)
         {
             operate_fail_chk.Checked = false;
             operate_suc_chk.Checked = true;
-            //orderInfo.oos[index].feedback = true;
-            //orderInfo.oos[index].feedbackTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         private void operate_fail_Click(object sender, EventArgs e)

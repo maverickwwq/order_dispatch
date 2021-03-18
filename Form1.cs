@@ -96,23 +96,19 @@ namespace zk
                     return;
             }
 
-            if (GlobalVarForApp.tbh_ordersInfoList.Count == ordersInfoListBuffer.Count)
-            {
+            if (GlobalVarForApp.tbh_ordersInfoList.Count == ordersInfoListBuffer.Count){
                 bool theyAreTheSame = true;
-                for (int j = 0; j < ordersInfoListBuffer.Count; j++)
-                {
-                    if (GlobalVarForApp.tbh_ordersInfoList[j] != ordersInfoListBuffer[j])
-                    {
+                for (int j = 0; j < ordersInfoListBuffer.Count; j++){
+                    if (GlobalVarForApp.tbh_ordersInfoList[j] != ordersInfoListBuffer[j]){
                         theyAreTheSame = false;
                         break;
                     }
                 }
-                if (theyAreTheSame == true)
-                {
+                if (theyAreTheSame == true){
                     return;
                 }
             }
-              ordersInfoListBuffer.Clear();
+            ordersInfoListBuffer.Clear();
             lock(GlobalVarForApp.tbh_ordersInfoList){
               for(int j=0;j<GlobalVarForApp.tbh_ordersInfoList.Count;j++)
                 ordersInfoListBuffer.Add(GlobalVarForApp.tbh_ordersInfoList[j]);
@@ -123,24 +119,12 @@ namespace zk
 #endif
             tbd_OrderInfo_dgv.Rows.Clear();        //先清空
             int ordersCount = 0;                          //
-            foreach (OrderInfo tmpOrInfo in ordersInfoListBuffer)
-            {
+            foreach (OrderInfo tmpOrInfo in ordersInfoListBuffer){
                 tbd_OrderInfo_dgv.Rows.Add(1);      //增加一行显示
                 tbd_OrderInfo_dgv.Rows[ordersCount].Height = 60;    //行高60
                 tbd_OrderInfo_dgv.Rows[ordersCount].Cells[0].Value = (ordersCount+1).ToString();        //第一列 序号 按调度令增序排列
                 tbd_OrderInfo_dgv.Rows[ordersCount].Cells[1].Value = tmpOrInfo.orderCode;//第二列调度令号
                 bool gudingrenwuBool = false;
-                /*foreach(Order_Op_Content ooc in tmpOrInfo.ooc){
-                  ooc=new Order_Op_Content();
-                  Console.WriteLine("---_______----------------------_____------");
-                  Console.WriteLine(ooc.startDate);
-                  Console.WriteLine(ooc.endDate);
-                  if(ooc.startDate.Equals(ooc.endDate)){}
-                  else{
-                    gudingrenwuBool=true;
-                    break;
-                  }
-                }*/
                 string tmp = "";
                 for (int i = 0; i < tmpOrInfo.orderOpCount; i++)
                 {
@@ -258,9 +242,7 @@ namespace zk
         private void mouseClickOrder(object sender, DataGridViewCellMouseEventArgs e)
         {
             Console.WriteLine(e.RowIndex);
-            if (e.RowIndex != -1)
-            {
-                //MessageBox.Show("cell click"+e.RowIndex);
+            if (e.RowIndex != -1){
                 Form orderInfoForm1 = new orderInfoForm(e.RowIndex);
                 orderInfoForm1.Show();
             }

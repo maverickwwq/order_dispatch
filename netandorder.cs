@@ -135,6 +135,7 @@ namespace zk
 #endif
             RSData rcv_rsd = new RSData();
             OrderInfo tmpOI;
+            int index=-1;
             while (true)
             {
                 while (GlobalVarForApp.receiveMessageQueue.Count > 0)  //队列中有消息进行处理
@@ -147,35 +148,24 @@ namespace zk
                     {
                         case "LOGIN_REPLY":
                             break;
-
                         case "ADD_USER_REPLY":
                             break;
-
                         case "DELETE_USER_REPLY":
                             break;
 
                         case "DOWN_ORDER":              //把GlobalVarForApp.receiveMessageQueue里的RSD数据整理成tbh_ordersInfoList里的List<OrderInfo>数据
                             tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
+                            //这里没有做 调度令重复 的检测
+                            //默认是新下发的调度令
                             tmpOI.setRecTime();
                             tmpOI.setOdStatus(OrderStatus.sysReceive);
                             lock(GlobalVarForApp.tbh_ordersInfoList){
                               GlobalVarForApp.tbh_ordersInfoList.Add(tmpOI);    //将信息加入到tbh_ordersInfoList里
                               GlobalVarForApp.tbh_ordersInfoList.Sort();        //对tbh进行排序
                             }
-                            RSData sendTmp=new RSData();              //send "RECEIVE_ORDER"
-                            sendTmp.CommType="RECEIVE_ORDER";
-                            sendTmp.CommTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                            sendTmp.CommDept=GlobalVarForApp.client_type;
-                            sendTmp.order=new Order();
-                            sendTmp.order.orderId=rcv_rsd.order.orderId;
-                            sendTmp.order.orderCode=rcv_rsd.order.orderCode;
-                            sendTmp.order.orderRecordList = new List<OrderRecord>();
 
-                            for(int j=0;j<rcv_rsd.order.orderOpList.Count;j++){
-                              OrderRecord orTmp = new OrderRecord();
-                              orTmp.orderNumId = rcv_rsd.order.orderOpList[j].orderNumId;
-                              sendTmp.order.orderRecordList.Add(orTmp);
-                            }
+                            RSData sendTmp = new RSData();
+                            sendTmp.fill_receive_order(tmpOI);
                             network.sendData(sendTmp);
                             //GlobalVarForApp.f.UIrefresh(null,null);
                             break;
@@ -183,19 +173,54 @@ namespace zk
                         case "RECEIVE_ORDER_REPLY":              //
                             Console.WriteLine("receive order reply");
                             tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
-                            int index=-1;
+                            index=-1;
                             lock(GlobalVarForApp.tbh_ordersInfoList){
                               index=GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
                               if(index != -1){
                                     Console.WriteLine("find order");
                                     GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.unconfirmed);
-                                    GlobalVarForApp.tbh_ordersInfoList[index].setRecTime();
+                                    //GlobalVarForApp.tbh_ordersInfoList[index].setRecTime();
+                              }
+                              else{     //收到receive order reply,却没有找到该调度令,那就是出错了
+                                  Console.WriteLine("收到receive order reply，内存里找不到该调度令的相关信息");
                               }
                             }
                             break;
-                        case "DOWN_ORDER_REPLY":
+
+                        case "CONFIRM_ORDER_REPLY":
+                            Console.WriteLine("confirm order reply");
+                            tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
+                            index = -1;
+                            lock (GlobalVarForApp.tbh_ordersInfoList)
+                            {
+                                index = GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
+                                if (index != -1)
+                                {
+                                    Console.WriteLine("find order");
+                                    GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.confirmed_noFeedback);
+                                    //GlobalVarForApp.tbh_ordersInfoList[index].setConfTime();
+                                }
+                                else{
+                                    Console.WriteLine("收到confirm order reply，内存里找不到该调度令的相关信息");
+                                }
+                            }
                             break;
 
+                        case "FEEDBACK_ORDER_REPLY":    //这里假设feedback order reply 返回所有orderOP的反馈
+                            Console.WriteLine("feedback order reply");
+                            tmpOI=new OrderInfo(rcv_rsd.order);
+                            index=-1;
+                            lock(GlobalVarForApp.tbh_ordersInfoList){
+                              index = GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
+                              if(index != -1){
+                                  GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.feedbacked);
+                                  //GlobalVarForApp.tbh_ordersInfoList[index].setFbTime();
+                              }
+                              else{
+                                  Console.WriteLine("收到feedback order reply，但内存里找不到相关信息");
+                              }
+                            }
+                            break;
                         case "QUERY_ORDERS_REPLY":      //批量查询
                             break;
 
@@ -205,19 +230,6 @@ namespace zk
                         case "NEW_MESSAGE":
                             break;
 
-                        case "CONFIRM_ORDER_REPLY":
-                            Console.WriteLine("confirm order reply");
-                            tmpOI = new OrderInfo(rcv_rsd.order);   //临时工tmpOI
-                            index=-1;
-                            lock(GlobalVarForApp.tbh_ordersInfoList){
-                              index=GlobalVarForApp.tbh_ordersInfoList.FindIndex(tmpOI.matchOrderID);
-                              if(index != -1){
-                                    Console.WriteLine("find order");
-                                    GlobalVarForApp.tbh_ordersInfoList[index].setOdStatus(OrderStatus.confirmed_noFeedback);
-                                    GlobalVarForApp.tbh_ordersInfoList[index].setConfTime();
-                              }
-                            }
-                            break;
                         default: /* 可选的 */
                             break;
 
